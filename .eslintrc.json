@@ -28,8 +28,7 @@
             "never"
         ],
         "no-unused-vars": [
-            "warn",
-            {"ignore-pattern": "^_"}
+            "warn"
         ]
     }
 }

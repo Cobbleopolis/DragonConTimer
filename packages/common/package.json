@@ -1,0 +1,13 @@
+{
+  "name": "@dct/common",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Common code foor the DrgonCon LAN Gaming timer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cobbleopolis",
+  "license": "MIT",
+  "type": "module"
+}

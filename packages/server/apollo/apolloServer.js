@@ -16,7 +16,7 @@ export default function(app, path) {
         // Pass a different path here if your ApolloServer serves at
         // a different path.
         path,
-    });
+    })
     
     const pubsub = new PubSub()
     const apolloSchema = schema(pubsub)
@@ -42,5 +42,5 @@ export default function(app, path) {
         ]
     })
 
-    return apolloServer;
+    return apolloServer
 }
