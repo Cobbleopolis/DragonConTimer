@@ -21,5 +21,9 @@ export default mongoose.model('Console', {
             }
         ],
         required: false
+    },
+    checkoutWarning: {
+        type: String,
+        required: false
     }
 })

@@ -36,6 +36,7 @@ const app = createApp({
     render: () => h(App),
 })
 
+// app.use(VueApollo)
 app.use(createPinia())
 app.use(router)
 

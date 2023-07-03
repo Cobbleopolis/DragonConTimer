@@ -2,7 +2,7 @@
     <ul class="dropdown-menu dropdown-menu-end m-0" aria-labelledby="themeSwitcher">
         <li v-for="theme of themes" :key="theme">
             <button class="dropdown-item d-flex align-items-center" type="button" @click="select(theme)">
-                {{ getDisplayName(theme) }}
+                <span class="text-capitalize">{{ theme }}</span>
             </button>
         </li>
     </ul>
@@ -20,11 +20,7 @@ export default {
     },
     methods: {
         select(theme) {
-            console.log(theme)
             this.$themes.select(theme)
-        },
-        getDisplayName(theme) {
-            return theme.toUpperCase()
         }
     }
 }
