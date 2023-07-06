@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-2">
         <div class="card-header">
-            <span v-if="consoleReq.loading">Loading</span>
+            <span v-if="consoleReq.loading">Loading...</span>
             <span v-else>
                 {{ console.name }}
             </span>

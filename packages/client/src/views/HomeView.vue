@@ -1,13 +1,13 @@
 <template>
   <main class="container">
     <h1>Hello, world!</h1>
-    <button class="btn btn-primary" @click="consoleReq.refetch">Refetch</button>
+    <button class="btn btn-primary" @click="stationListReq.refetch">Refetch</button>
     <br>
-    <template v-if="consoleReq.loading">
+    <template v-if="stationListReq.loading">
         <LoadingAnimation />
     </template>
-    <template v-else-if="consoleReq.result">
-        <ConsoleComponent :console-id="console._id" v-for="console of consoleReq.result.console" :key="console._id" />
+    <template v-else-if="stationListReq.result">
+        <StationComponent :station-id="station._id" v-for="station of stationListReq.result.station" :key="station._id" />
     </template>
   </main>
 </template>
@@ -18,20 +18,23 @@ import gql from 'graphql-tag'
 
 export default {
     data() {
-        const consoleReq = useQuery(gql`query Query {console {_id}}`)
-        // const consoles = computed(() => res.value?.console ?? [])
-
-        // onResult(result => console.log(result))
-
+        const stationListReq = useQuery(gql `
+        query Query {
+            station {
+                _id
+                consoleOptions
+                status
+            }
+        }`)
         return {
-            consoleReq
+            stationListReq
         }
     },
-    
+    components: { StationComponent }
 }
 </script>
 
 <script setup>
 import LoadingAnimation from '../components/LoadingAnimation.vue'
-import ConsoleComponent from '../components/ConsoleComponent.vue'
+import StationComponent from '../components/StationComponent.vue'
 </script>
