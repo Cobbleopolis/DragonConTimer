@@ -71,7 +71,7 @@ export default function(pubsub) {
 
                 // extend resolve params with hook
                 const mutationOperation = prefix + determineMutationOperation(k)
-                rp.beforeRecordMutate = async function (doc, rp) {
+                rp.beforeRecordMutate = async function (doc) {
                     pubsub.publish(changedKey, { [changedKey]: doc })
                     pubsub.publish(mutationOperation, { [mutationOperation]: doc })
                     return doc
@@ -89,6 +89,7 @@ export default function(pubsub) {
             prefix + 'Create',
             prefix + 'Update',
             prefix + 'Remove',
+            prefix + 'Changed'
         ]
         let subscriptionObj = {}
         keys.forEach(k => {
@@ -109,15 +110,26 @@ export default function(pubsub) {
                         (payload, variables) => payload[k]._id.toString() === variables.recordId
                     )
                 }
+                subscriptionObj[k + 'ByIds'] = {
+                    type: typeComposer,
+                    args: {
+                        recordIds: '[MongoID]!'
+                    },
+                    resolve: payload => payload[k],
+                    subscribe: withFilter(
+                        () => pubsub.asyncIterator(k),
+                        (payload, variables) => variables.recordIds.includes(payload[k]._id.toString())
+                    )
+                }
             }
         })
     
-        let changedKey = prefix + 'Changed'
-        subscriptionObj[changedKey] = {
-            type: typeComposer,
-            resolve: payload => payload[changedKey],
-            subscribe: () => pubsub.asyncIterator(changedKey)
-        }
+        // let changedKey = prefix + 'Changed'
+        // subscriptionObj[changedKey] = {
+        //     type: typeComposer,
+        //     resolve: payload => payload[changedKey],
+        //     subscribe: () => pubsub.asyncIterator(changedKey)
+        // }
         
         return subscriptionObj
     }

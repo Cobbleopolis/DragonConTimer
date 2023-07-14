@@ -22,7 +22,8 @@
 import { onMounted, ref } from 'vue'
 import * as bootstrap from 'bootstrap'
 defineProps({
-    station: Object
+    station: Object,
+    consoleOptions: Array
 })
 
 let modalRoot = ref(null)

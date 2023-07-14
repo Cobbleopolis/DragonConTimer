@@ -33,7 +33,7 @@
                 </form>
             </div>
             <button class="btn btn-primary" @click="showCheckoutModal()">Checkout</button>
-            <StationCheckoutModal :station="station" ref="checkoutModal"/>
+            <StationCheckoutModal :station="station" :console-options="consoleOptions" ref="checkoutModal"/>
         </template>
     </div>
 </template>
@@ -118,6 +118,33 @@ export default {
                 return { stationById: subscriptionData.data.stationUpdateById }
             }
         }))
+
+        consoleReq.subscribeToMore(() => ({
+            document: gql`
+            subscription ConsoleUpdateByIds($recordIds: [MongoID]!) {
+                consoleUpdateByIds(recordIds: $recordIds) {
+                    _id
+                    checkoutWarning
+                    games {
+                        count
+                        name
+                    }
+                    name
+                }
+            }`,
+            variables: {
+                recordIds: consoleOptions.value?.map(x => x._id)
+            },
+            updateQuery: (previousResult, { subscriptionData }) => {
+                const tmp = [...previousResult]
+                for (let i in tmp) {
+                    if (tmp[i]._id == subscriptionData.data.consoleUpdateByIds._id) {
+                        tmp[i] = subscriptionData.data.consoleUpdateByIds
+                    }
+                }
+                return tmp
+            }
+        }))
         return {
             stationReq,
             station,
@@ -127,7 +154,7 @@ export default {
     },
     methods: {
         isLoading() {
-            this.stationReq.isLoading || this.consoleReq.isLoading
+            this.stationReq.loading || this.consoleReq.loading
         },
         showCheckoutModal() {
             this.checkoutModal.show()
