@@ -1,3 +1,4 @@
+import { withFilter } from 'graphql-subscriptions'
 import { schemaComposer } from 'graphql-compose'
 import { composeMongoose } from 'graphql-compose-mongoose'
 
@@ -39,6 +40,16 @@ export default function(pubsub) {
         queryObj[prefix + 'Pagination'] = typeComposer.mongooseResolvers.pagination()
         return queryObj
     }
+
+    function determineMutationOperation(mutationName) {
+        if(mutationName.toLowerCase().indexOf('create') !== -1) {
+            return 'Create'
+        } else if (mutationName.toLowerCase().indexOf('update') !== -1) {
+            return 'Update'
+        } else if (mutationName.toLowerCase().indexOf('remove') !== -1) {
+            return 'Remove'
+        }
+    }
     
     function generateMutationObj(prefix, typeComposer) {
         let mutationObj = {}
@@ -56,19 +67,18 @@ export default function(pubsub) {
     
         // Generate subscription hooks
         Object.keys(mutationObj).forEach((k) => {
-            if (k != 'UpdateMany' && k != 'RemoveMany')
-                mutationObj[k] = mutationObj[k].wrapResolve(next => async rp => {
-    
-                    // extend resolve params with hook
-                    
-                    rp.beforeRecordMutate = async function (doc, rp) {
-                        pubsub.publish(changedKey, { [changedKey]: doc })
-                        pubsub.publish(k, { [k]: doc })
-                        return doc
-                    }
-    
-                    return next(rp)
-                })
+            mutationObj[k] = mutationObj[k].wrapResolve(next => async rp => {
+
+                // extend resolve params with hook
+                const mutationOperation = prefix + determineMutationOperation(k)
+                rp.beforeRecordMutate = async function (doc, rp) {
+                    pubsub.publish(changedKey, { [changedKey]: doc })
+                    pubsub.publish(mutationOperation, { [mutationOperation]: doc })
+                    return doc
+                }
+
+                return next(rp)
+            })
         })
     
         return mutationObj
@@ -77,11 +87,8 @@ export default function(pubsub) {
     function generateSubscriptionObj(prefix, typeComposer) {
         const keys = [
             prefix + 'Create',
-            prefix + 'CreateMany',
-            prefix + 'UpdateById',
-            prefix + 'UpdateOne',
-            prefix + 'RemoveById',
-            prefix + 'RemoveOne',
+            prefix + 'Update',
+            prefix + 'Remove',
         ]
         let subscriptionObj = {}
         keys.forEach(k => {
@@ -89,6 +96,19 @@ export default function(pubsub) {
                 type: typeComposer,
                 resolve: payload => payload[k],
                 subscribe: () => pubsub.asyncIterator(k)
+            }
+            if (!k.includes('Create')) {
+                subscriptionObj[k + 'ById'] = {
+                    type: typeComposer,
+                    args: {
+                        recordId: 'MongoID!'
+                    },
+                    resolve: payload => payload[k],
+                    subscribe: withFilter(
+                        () => pubsub.asyncIterator(k),
+                        (payload, variables) => payload[k]._id.toString() === variables.recordId
+                    )
+                }
             }
         })
     

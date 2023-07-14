@@ -1,7 +1,6 @@
 <template>
   <main class="container">
     <h1>Hello, world!</h1>
-    <button class="btn btn-primary" @click="stationListReq.refetch">Refetch</button>
     <br>
     <template v-if="stationListReq.loading">
         <LoadingAnimation />
