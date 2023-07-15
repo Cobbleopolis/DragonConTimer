@@ -4,8 +4,14 @@ import buildinfo from '@dct/common/buildinfo.js'
 
 const app = express()
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
+// app.get('/', (req, res) => {
+//     res.send('Hello World!')
+// })
+
+app.use('/', express.static('public'))
+
+app.get('/alive', (req, res) => {
+    res.status(200).json({status:"ok"});
 })
 
 app.get('/version', (req, res) => {

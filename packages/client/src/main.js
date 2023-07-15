@@ -23,12 +23,12 @@ import * as bootstrap from 'bootstrap'
 import Themes from './services/ThemesService'
 
 const httpLink = createHttpLink({
-    uri: 'http://localhost:9000/gql',
+    uri: 'http://' + import.meta.env.VITE_GQL_URL,
 })
 
 const wsLink = new GraphQLWsLink(
     createClient({
-        url: 'ws://localhost:9000/gql',
+        url: 'ws://' + import.meta.env.VITE_GQL_URL,
     })
 )
 

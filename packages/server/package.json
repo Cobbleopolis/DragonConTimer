@@ -1,38 +1,39 @@
 {
-    "name": "@dct/server",
-    "private": true,
-    "version": "3.0.0",
-    "description": "Timer for DragonCon LAN Gaming",
-    "main": "server.js",
-    "scripts": {
-      "dev": "nodemon server.js",
-      "lint": "eslint **/* --fix",
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "type": "module",
-    "author": "Cobbleopolis",
-    "license": "MIT",
-    "dependencies": {
-      "apollo-datasource-mongodb": "^0.5.4",
-      "apollo-server": "^3.10.3",
-      "apollo-server-express": "^3.10.3",
-      "body-parser": "^1.20.1",
-      "@dct/common": "*",
-      "cors": "^2.8.5",
-      "express": "^4.18.2",
-      "graphql": "^16.6.0",
-      "graphql-compose": "^9.0.10",
-      "graphql-compose-mongoose": "^9.7.2",
-      "graphql-subscriptions": "^2.0.0",
-      "graphql-ws": "^5.11.2",
-      "mongodb": "^4.11.0",
-      "mongoose": "^6.7.0",
-      "morgan": "^1.10.0",
-      "ws": "^8.10.0"
-    },
-    "devDependencies": {
-      "eslint": "^8.26.0",
-      "nodemon": "^2.0.20"
-    }
+  "name": "@dct/server",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Timer for DragonCon LAN Gaming",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "build": "copyfiles -e \"./node_modules/**/*\" ./**/* ./dist",
+    "lint": "eslint **/* --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "Cobbleopolis",
+  "license": "MIT",
+  "dependencies": {
+    "@dct/common": "*",
+    "apollo-datasource-mongodb": "^0.5.4",
+    "apollo-server": "^3.10.3",
+    "apollo-server-express": "^3.10.3",
+    "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "graphql": "^16.6.0",
+    "graphql-compose": "^9.0.10",
+    "graphql-compose-mongoose": "^9.7.2",
+    "graphql-subscriptions": "^2.0.0",
+    "graphql-ws": "^5.11.2",
+    "mongodb": "^4.11.0",
+    "mongoose": "^6.7.0",
+    "morgan": "^1.10.0",
+    "ws": "^8.10.0"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.26.0",
+    "nodemon": "^2.0.20"
   }
-  
+}

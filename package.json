@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "lerna run dev",
     "build": "lerna run build",
+    "build-docker": "",
     "lint": "eslint **/* --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
