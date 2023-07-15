@@ -1,10 +1,8 @@
 <template>
     <div class="card mb-2">
         <div class="card-header">
-            <span v-if="isLoading()">Loading...</span>
-            <span v-else>
-                {{ station.name }}&nbsp;({{ consoleOptions.map(x => x.name).join(", ") }})
-            </span>
+            <span v-if="!isLoading()" >{{ station.name }}&nbsp;({{ station.status }})</span>
+            <span v-else class="placeholder col-2"></span>
         </div>
         <template v-if="isLoading()">
             <div class="card-body">
@@ -13,27 +11,33 @@
         </template>
         <template v-else>
             <div class="card-body">
-                <p>{{ stationId }}</p>
-                <p>{{ station }}</p>
+                <p>Console Options: 
+                    <span v-if="!isLoading() && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
+                    <span v-else class="placeholder col-2"></span>
+                </p>
+                <p>Time since checkout: <span v-if="timeSinceCheckout.value">{{ timeSinceCheckout.value }}</span></p>
                 <form>
                     <div class="row g-2">
                         <div class="col-12 col-md-4">
                             <label :for="'playerName' + stationId">Player Name</label>
-                            <input type="text" class="form-control" :id="'playerName' + stationId" :value="station.playerName" disabled>
+                            <input type="text" class="form-control" :id="'playerName' + stationId"
+                                :value="station.playerName" disabled>
                         </div>
                         <div class="col-12 col-md-4">
                             <label :for="'currentConsole' + stationId">Current Console</label>
-                            <input type="text" class="form-control" :id="'currentConsole' + stationId" :value="station.currentConsole" disabled>
+                            <input type="text" class="form-control" :id="'currentConsole' + stationId"
+                                :value="station.currentConsole" disabled>
                         </div>
                         <div class="col-12 col-md-4">
                             <label :for="'currentGame' + stationId">Current Game</label>
-                            <input type="text" class="form-control" :id="'currentGame' + stationId" :value="station.currentGame" disabled>
+                            <input type="text" class="form-control" :id="'currentGame' + stationId"
+                                :value="station.currentGame" disabled>
                         </div>
                     </div>
                 </form>
             </div>
             <button class="btn btn-primary" @click="showCheckoutModal()">Checkout</button>
-            <StationCheckoutModal :station="station" :console-options="consoleOptions" ref="checkoutModal"/>
+            <StationCheckoutModal :station="station" :console-options="consoleOptions" ref="checkoutModal" />
         </template>
     </div>
 </template>
@@ -44,6 +48,8 @@ import StationCheckoutModal from './modals/StationCheckoutModal.vue'
 import { computed, ref } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
+import moment from 'moment'
+import timeUtils from '../utils/timeUtils'
 
 export default {
     props: {
@@ -54,8 +60,15 @@ export default {
 
         return { checkoutModal }
     },
+    created() {
+        this.getFormattedTimeFromNow()
+        setInterval(this.getFormattedTimeFromNow, 1000)
+    },
+    unmounted() {
+        clearInterval(this.getFormattedTimeFromNow)
+    },
     data() {
-        const stationReq = useQuery(gql `
+        const stationReq = useQuery(gql`
         query StationById($stationId: MongoID!) {
             stationById(_id: $stationId) {
                 checkoutTime
@@ -91,10 +104,12 @@ export default {
         }))
 
         const station = computed(() => stationReq.result.value?.stationById ?? {})
-        const consoleOptions = computed (() => consoleReq.result.value?.consoleByIds ?? [])
+        const timeSinceCheckout = ref({})
+        const consoleOptions = computed(() => consoleReq.result.value?.consoleByIds ?? [])
 
         stationReq.onResult(() => {
             consoleReqEnabled.value = true
+            this.getFormattedTimeFromNow()
         })
 
         stationReq.subscribeToMore(() => ({
@@ -149,7 +164,8 @@ export default {
             stationReq,
             station,
             consoleReq,
-            consoleOptions
+            consoleOptions,
+            timeSinceCheckout
         }
     },
     methods: {
@@ -158,6 +174,13 @@ export default {
         },
         showCheckoutModal() {
             this.checkoutModal.show()
+        },
+        getFormattedTimeFromNow() {
+            if (!this.isLoading() && this.station.checkoutTime) {
+                this.timeSinceCheckout.value = timeUtils.formatDurationFormat(moment.duration(moment().diff(moment(this.station.checkoutTime))))
+            } else {
+                this.timeSinceCheckout.value = null
+            }
         }
     },
     components: { LoadingAnimation, StationCheckoutModal }

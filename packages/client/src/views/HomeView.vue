@@ -1,9 +1,9 @@
 <template>
-  <main class="container">
-    <h1>Hello, world!</h1>
-    <br>
+  <main class="container pt-2">
     <template v-if="stationListReq.loading">
-        <LoadingAnimation />
+        <div class="d-flex justify-content-center">
+            <LoadingAnimation />
+        </div>
     </template>
     <template v-else-if="stationListReq.result">
         <StationComponent :station-id="station._id" v-for="station of stationListReq.result.station" :key="station._id" />
