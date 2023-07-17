@@ -41,7 +41,19 @@ const link = split( //Splitting the traffic between ws and http
     httpLink
 )
 
-const cache = new InMemoryCache()
+const cache = new InMemoryCache({
+    typePolicies: {
+        Query: {
+            fields: {
+                station: {
+                    merge(existing, incoming) {
+                        return incoming
+                    }
+                }
+            }
+        }
+    }
+})
 const apolloClient = new ApolloClient({
     link,
     cache,

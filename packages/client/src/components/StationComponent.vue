@@ -4,48 +4,43 @@
             <span v-if="!isLoading()" >{{ station.name }}&nbsp;({{ station.status }})</span>
             <span v-else class="placeholder col-2"></span>
         </div>
-        <template v-if="isLoading()">
-            <div class="card-body">
-                <LoadingAnimation />
-            </div>
-        </template>
-        <template v-else>
-            <div class="card-body">
-                <p>Console Options: 
-                    <span v-if="!isLoading() && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
-                    <span v-else class="placeholder col-2"></span>
-                </p>
-                <p>Time since checkout: <span v-if="timeSinceCheckout.value">{{ timeSinceCheckout.value }}</span></p>
-                <form>
-                    <div class="row g-2">
-                        <div class="col-12 col-md-4">
-                            <label :for="'playerName' + stationId">Player Name</label>
-                            <input type="text" class="form-control" :id="'playerName' + stationId"
-                                :value="station.playerName" disabled>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <label :for="'currentConsole' + stationId">Current Console</label>
-                            <input type="text" class="form-control" :id="'currentConsole' + stationId"
-                                :value="station.currentConsole" disabled>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <label :for="'currentGame' + stationId">Current Game</label>
-                            <input type="text" class="form-control" :id="'currentGame' + stationId"
-                                :value="station.currentGame" disabled>
-                        </div>
+        <div class="card-body">
+            <p>Console Options: 
+                <span v-if="!isLoading() && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
+                <span v-else class="placeholder col-2"></span>
+            </p>
+            <p>Time since checkout: 
+                <span v-if="timeSinceCheckout.value">{{ timeSinceCheckout.value }}</span>
+                <span v-else class="placeholder col-2"></span>
+            </p>
+            <form>
+                <div class="row g-2">
+                    <div class="col-12 col-md-4">
+                        <label :for="'playerName' + stationId">Player Name</label>
+                        <input type="text" class="form-control" :id="'playerName' + stationId"
+                            :value="station.playerName" disabled>
                     </div>
-                </form>
-            </div>
-            <button class="btn btn-primary" @click="showCheckoutModal()">Checkout</button>
-            <StationCheckoutModal :station="station" :console-options="consoleOptions" ref="checkoutModal" />
-        </template>
+                    <div class="col-12 col-md-4">
+                        <label :for="'currentConsole' + stationId">Current Console</label>
+                        <input type="text" class="form-control" :id="'currentConsole' + stationId"
+                            :value="station.currentConsole" disabled>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label :for="'currentGame' + stationId">Current Game</label>
+                        <input type="text" class="form-control" :id="'currentGame' + stationId"
+                            :value="station.currentGame" disabled>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <button class="btn btn-primary" @click="showCheckoutModal()">Checkout</button>
+        <StationCheckoutModal :station="station" :console-options="consoleOptions" ref="checkoutModal" />
     </div>
 </template>
 
 <script>
-import LoadingAnimation from './LoadingAnimation.vue'
 import StationCheckoutModal from './modals/StationCheckoutModal.vue'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import moment from 'moment'
@@ -55,19 +50,9 @@ export default {
     props: {
         stationId: String
     },
-    setup() {
+    setup(props) {
         const checkoutModal = ref(null)
 
-        return { checkoutModal }
-    },
-    created() {
-        this.getFormattedTimeFromNow()
-        setInterval(this.getFormattedTimeFromNow, 1000)
-    },
-    unmounted() {
-        clearInterval(this.getFormattedTimeFromNow)
-    },
-    data() {
         const stationReq = useQuery(gql`
         query StationById($stationId: MongoID!) {
             stationById(_id: $stationId) {
@@ -80,7 +65,7 @@ export default {
                 playerName
                 status
             }
-        }`, this.$props)
+        }`, props)
 
         const consoleReqEnabled = ref(false)
 
@@ -107,9 +92,15 @@ export default {
         const timeSinceCheckout = ref({})
         const consoleOptions = computed(() => consoleReq.result.value?.consoleByIds ?? [])
 
+        onMounted(() => {
+            if (stationReq.result.value?.stationById) { 
+                consoleReqEnabled.value = true
+            }
+        })
+
         stationReq.onResult(() => {
             consoleReqEnabled.value = true
-            this.getFormattedTimeFromNow()
+            // this.getFormattedTimeFromNow()
         })
 
         stationReq.subscribeToMore(() => ({
@@ -127,7 +118,7 @@ export default {
                 }
             }`,
             variables: {
-                recordId: this.$props.stationId
+                recordId: props.stationId
             },
             updateQuery: (previousResult, { subscriptionData }) => {
                 return { stationById: subscriptionData.data.stationUpdateById }
@@ -160,13 +151,23 @@ export default {
                 return tmp
             }
         }))
-        return {
+
+        return { 
             stationReq,
             station,
             consoleReq,
+            consoleReqEnabled,
             consoleOptions,
-            timeSinceCheckout
+            timeSinceCheckout,
+            checkoutModal 
         }
+    },
+    created() {
+        this.getFormattedTimeFromNow()
+        setInterval(this.getFormattedTimeFromNow, 1000)
+    },
+    unmounted() {
+        clearInterval(this.getFormattedTimeFromNow)
     },
     methods: {
         isLoading() {
@@ -183,7 +184,7 @@ export default {
             }
         }
     },
-    components: { LoadingAnimation, StationCheckoutModal }
+    components: { StationCheckoutModal }
 }
 
 </script>
