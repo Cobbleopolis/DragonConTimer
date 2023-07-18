@@ -23,7 +23,7 @@
                     <div class="col-12 col-md-4">
                         <label :for="'currentConsole' + stationId">Current Console</label>
                         <input type="text" class="form-control" :id="'currentConsole' + stationId"
-                            :value="station.currentConsole" disabled>
+                            :value="currentConsole" disabled>
                     </div>
                     <div class="col-12 col-md-4">
                         <label :for="'currentGame' + stationId">Current Game</label>
@@ -93,6 +93,15 @@ export default {
         const timeSinceCheckout = ref({})
         const consoleOptions = computed(() => consoleReq.result.value?.consoleByIds ?? [])
 
+        const currentConsole = computed(() => {
+            if (consoleOptions.value && consoleOptions.value.length > 0)
+                for(let c of consoleOptions.value) {
+                    if (c._id === station.value.currentConsole)
+                        return c.name
+                }
+            return ''
+        })
+
         onMounted(() => {
             if (stationReq.result.value?.stationById) { 
                 consoleReqEnabled.value = true
@@ -161,6 +170,7 @@ export default {
             consoleReqEnabled,
             consoleOptions,
             timeSinceCheckout,
+            currentConsole,
             checkoutModal 
         }
     },
