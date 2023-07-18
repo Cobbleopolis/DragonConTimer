@@ -56,6 +56,7 @@ export default {
         const stationReq = useQuery(gql`
         query StationById($stationId: MongoID!) {
             stationById(_id: $stationId) {
+                _id
                 checkoutTime
                 consoleOptions
                 currentConsole
@@ -107,6 +108,7 @@ export default {
             document: gql`
             subscription StationUpdateById($recordId: MongoID!) {
                 stationUpdateById(recordId: $recordId) {
+                    _id
                     checkoutTime
                     consoleOptions
                     currentConsole
@@ -174,7 +176,7 @@ export default {
             this.stationReq.loading || this.consoleReq.loading
         },
         showCheckoutModal() {
-            this.checkoutModal.show()
+            this.checkoutModal.show(true)
         },
         getFormattedTimeFromNow() {
             if (!this.isLoading() && this.station.checkoutTime) {
