@@ -186,7 +186,7 @@ export default {
             this.stationReq.loading || this.consoleReq.loading
         },
         showCheckoutModal() {
-            this.checkoutModal.show(true)
+            this.checkoutModal.show(true, true)
         },
         getFormattedTimeFromNow() {
             if (!this.isLoading() && this.station.checkoutTime) {

@@ -49,10 +49,20 @@
                             </div>
                         </div>
                         <div class="mb-3" v-if="updateTime">
-                            <div class="form-check">
+                            <div class="input-group">
+                                <div class="input-group-text">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="useCustomTimeInput" v-model="useCustomTime">
+                                        <label class="form-check-label" id="useCustomTimeLabel" for="useCustomTimeInput">Use Custom Time</label> 
+                                    </div>   
+                                </div>
+                                <input type="datetime-local" class="form-control" aria-label="Custom Time" :disabled="!useCustomTime" v-model="customTime">
+                                <button class="btn btn-outline-secondary" type="button" id="customTimeNowButton" @click="customTime = moment()">Now</button>
+                            </div>
+                            <!-- <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" id="useCustomTimeInput" v-model="useCustomTime">
                                 <label class="form-check-label" id="useCustomTimeLabel" for="useCustomTimeInput">Use Custom Time</label>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="mt-2 mb-3">
                             <label id="stationNotesLabel" class="form-label" for="stationNotesInput">Station Notes</label>
@@ -78,6 +88,8 @@ import { onMounted, ref } from 'vue'
 import { useMutation } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import * as bootstrap from 'bootstrap'
+import moment from 'moment'
+
 const props = defineProps({
     station: Object,
     consoleOptions: Array
@@ -97,6 +109,7 @@ const currentStationNotes = ref('')
 const isSubmitting = ref(false)
 const updateTime = ref(false)
 const useCustomTime = ref(false)
+const customTime = ref(null)
 
 onMounted(() => {
     modalObj = new bootstrap.Modal(modalRoot.value)
@@ -168,7 +181,13 @@ function submitForm() {
         notes: currentStationNotes.value
     }
 
-
+    if(updateTime.value) {
+        if(useCustomTime.value) {
+            updateRecord['checkoutTime'] = customTime.value
+        } else {
+            updateRecord['checkoutTime'] = moment()
+        }
+    }
         
     updateStation({
         id: props.station._id,
