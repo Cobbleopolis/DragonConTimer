@@ -3,7 +3,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Checkout Station: {{station.name}}</h5>
+                    <h5 class="modal-title">{{title}}: {{station.name}}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -57,7 +57,7 @@
                                     </div>   
                                 </div>
                                 <input type="datetime-local" class="form-control" aria-label="Custom Time" :disabled="!useCustomTime" v-model="customTime">
-                                <button class="btn btn-outline-secondary" type="button" id="customTimeNowButton" @click="customTime = moment()">Now</button>
+                                <button class="btn btn-outline-secondary" type="button" id="customTimeNowButton" @click="setCustomTime(moment())" :disabled="!useCustomTime">Now</button>
                             </div>
                             <!-- <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" id="useCustomTimeInput" v-model="useCustomTime">
@@ -66,8 +66,8 @@
                         </div>
                         <div class="mt-2 mb-3">
                             <label id="stationNotesLabel" class="form-label" for="stationNotesInput">Station Notes</label>
-                            <textarea rows="3" class="form-control" id="stationNotesInput" name="stationNotes" aria-describedby="stationNotesHelp" placeholder="Some notes if they're needed..." v-model="currentStationNotes"></textarea>
-                            <div id="stationNotesHelp" class="form-text">The name of the person checking out the station</div>
+                            <textarea rows="3" class="form-control" id="stationNotesInput" name="stationNotes" aria-describedby="stationNotesHelp" placeholder="Lorem ipsum..." v-model="currentStationNotes"></textarea>
+                            <div id="stationNotesHelp" class="form-text">Some notes we need to know</div>
                         </div>
                     </form>
                 </div>
@@ -98,6 +98,8 @@ const props = defineProps({
 let modalRoot = ref(null)
 let modalObj = null
 
+const title = ref('Checkout Station')
+
 const currentPlayerName = ref('')
 
 const currentConsole = ref('')
@@ -109,18 +111,24 @@ const currentStationNotes = ref('')
 const isSubmitting = ref(false)
 const updateTime = ref(false)
 const useCustomTime = ref(false)
-const customTime = ref(null)
+const customTime = ref('')
+
+let updateState = null
 
 onMounted(() => {
     modalObj = new bootstrap.Modal(modalRoot.value)
 })
 
-function _show(popFields, defaultTimeUpdateState) {
-    if(popFields) {
+function _show(options) {
+    if(options.popFields) {
         populateFields()
     }
+    title.value = options.title ?? 'Checkout Station'
     modalObj.show()
-    updateTime.value = defaultTimeUpdateState
+    updateTime.value = options.defaultTimeUpdateState ?? false
+    useCustomTime.value = options.defaultUpdateCustomTimeState ?? false
+
+    updateState = options.stateToUpdateTo
 }
 
 function _hide() {
@@ -140,6 +148,11 @@ function populateFields() {
     updateCurrentConsoleObj()
     currentGame.value = props.station?.currentGame ?? ''
     currentStationNotes.value = props.station?.notes ?? ''
+    setCustomTime(moment(props.station?.checkoutTime) ?? moment())
+}
+
+function setCustomTime(momentObj) {
+    customTime.value = momentObj.local().format('YYYY-MM-DD HH:mm:ss')
 }
 
 function updateCurrentConsoleObj() {
@@ -187,6 +200,10 @@ function submitForm() {
         } else {
             updateRecord['checkoutTime'] = moment()
         }
+    }
+
+    if(updateState) {
+        updateRecord['status'] = updateState
     }
         
     updateStation({

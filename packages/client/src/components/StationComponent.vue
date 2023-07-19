@@ -2,16 +2,16 @@
     <div class="card mb-2">
         <div class="card-header">
             <span v-if="!isLoading()" >{{ station.name }}&nbsp;({{ station.status }})</span>
-            <span v-else class="placeholder col-2"></span>
+            <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
         </div>
         <div class="card-body">
             <p>Console Options: 
                 <span v-if="!isLoading() && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
-                <span v-else class="placeholder col-2"></span>
+                <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
             </p>
             <p>Time since checkout: 
                 <span v-if="timeSinceCheckout.value">{{ timeSinceCheckout.value }}</span>
-                <span v-else class="placeholder col-2"></span>
+                <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
             </p>
             <form>
                 <div class="row g-2">
@@ -33,7 +33,19 @@
                 </div>
             </form>
         </div>
-        <button class="btn btn-primary" @click="showCheckoutModal()">Checkout</button>
+        <div class="card-footer text-body-secondary d-flex flex-wrap align-items-center">
+            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="btn-group me-2" role="group" aria-label="First group">
+                    <button class="btn btn-primary" @click="showCheckoutModal()"><i class="bi bi-box-arrow-up"></i> Checkout</button>
+                    <button class="btn btn-danger" @click="checkinStation()"><i class="bi bi-box-arrow-in-down"></i> Checkin/Return</button>
+                </div>
+                <div class="btn-group me-2" role="group" aria-label="Second group">
+                    <button class="btn btn-info" @click="showSetFieldsModal()"><i class="bi bi-pencil"></i> Set Fields</button>
+                    <button class="btn btn-info" @click="toggleAvailability()"><i class="bi bi-toggle-off"></i> Toggle Availibility</button>
+                </div>
+            </div>
+        </div>
+
         <StationCheckoutModal :station="station" :console-options="consoleOptions" ref="checkoutModal" />
     </div>
 </template>
@@ -186,7 +198,24 @@ export default {
             this.stationReq.loading || this.consoleReq.loading
         },
         showCheckoutModal() {
-            this.checkoutModal.show(true, true)
+            this.checkoutModal.show({
+                popFields: true, 
+                defaultTimeUpdateState: true, 
+                defaultUpdateCustomTimeState: false, 
+                stateToUpdateTo: 'CHECKED_OUT'
+            })
+        },
+        showSetFieldsModal() {
+            this.checkoutModal.show({
+                popFields: true,
+                title: 'Set Fields'
+            })
+        },
+        checkinStation() {
+            console.log('TODO')
+        },
+        toggleAvailability() {
+            console.log('TODO')
         },
         getFormattedTimeFromNow() {
             if (!this.isLoading() && this.station.checkoutTime) {
