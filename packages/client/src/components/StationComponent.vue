@@ -33,6 +33,9 @@
                 </div>
             </form>
         </div>
+        <ul class="list-group list-group-flush" v-if="station.notes">
+            <li class="list-group-item">Notes: {{station.notes}}</li>
+        </ul>
         <div class="card-footer text-body-secondary d-flex flex-wrap align-items-center">
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group me-2" role="group" aria-label="First group">

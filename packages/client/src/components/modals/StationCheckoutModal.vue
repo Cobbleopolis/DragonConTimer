@@ -67,7 +67,7 @@
                         </div>
                         <div class="mt-2 mb-3">
                             <label id="stationNotesLabel" class="form-label" for="stationNotesInput">Station Notes</label>
-                            <textarea rows="3" class="form-control" id="stationNotesInput" name="stationNotes" aria-describedby="stationNotesHelp" placeholder="Lorem ipsum..." v-model="currentStationNotes"></textarea>
+                            <textarea rows="1" class="form-control" id="stationNotesInput" name="stationNotes" aria-describedby="stationNotesHelp" placeholder="Lorem ipsum..." v-model="currentStationNotes"></textarea>
                             <div id="stationNotesHelp" class="form-text">Some notes we need to know</div>
                         </div>
                     </form>
