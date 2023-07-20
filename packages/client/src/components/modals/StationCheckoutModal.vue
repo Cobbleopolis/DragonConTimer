@@ -16,11 +16,12 @@
                             <input type="text" class="form-control" id="playerNameInput" name="playerName" aria-describedby="playerNameHelp" placeholder="John Doe" v-model="currentPlayerName"/>
                             <div id="playerNameHelp" class="form-text">The name of the person checking out the station</div>
                         </div>
+                        <p>Console Options: {{ consoleOptions.length }}</p>
                         <div class="mb-3">
                             <label id="consoleOptionLabel" class="form-label" for="consoleOptionInput">Console</label>
                             <select class="form-select" id="consoleOptionInput" aria-labelledby="consoleOptionLabel" aria-describedby="consoleOptionHelp" v-model="currentConsole" @change="updateCurrentConsoleObj()">
                                 <option disabled hidden :value="''" :selected="currentConsole == ''">Select Console</option>
-                                <option v-for="console in consoleOptions" :value="console._id" :key="console._id" :selected="currentConsole == console._id || consoleOptions.length === 1">{{ console.name }}</option>
+                                <option v-for="console in consoleOptions" :value="console._id" :key="console._id" :selected="currentConsole == console._id">{{ console.name }}</option>
                             </select>
                             <div id="consoleOptionHelp" class="form-text">The console they're going to play</div>
                         </div>
@@ -145,6 +146,9 @@ function _toggle(popFields) {
 function populateFields() {
     currentPlayerName.value = props.station?.playerName ?? ''
     currentConsole.value = props.station?.currentConsole ?? ''
+    if (props.consoleOptions.length === 1) {
+        currentConsole.value = props.consoleOptions[0]._id
+    }
     updateCurrentConsoleObj()
     currentGame.value = props.station?.currentGame ?? ''
     currentStationNotes.value = props.station?.notes ?? ''
