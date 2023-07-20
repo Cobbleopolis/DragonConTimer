@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-2">
         <div class="card-header">
-            <span v-if="!isLoading()" >{{ station.name }}&nbsp;({{ station.status }})</span>
+            <span v-if="!isLoading()" >{{ station.name }}&nbsp;({{ getStateDisplayName(station.status) }})</span>
             <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
         </div>
         <div class="card-body">
@@ -9,7 +9,7 @@
                 <span v-if="!isLoading() && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
                 <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
             </p>
-            <p>Time since checkout: 
+            <p v-if="isCheckedOut()">Time since checkout: 
                 <span v-if="timeSinceCheckout.value">{{ timeSinceCheckout.value }}</span>
                 <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
             </p>
@@ -53,10 +53,11 @@
 <script>
 import StationCheckoutModal from './modals/StationCheckoutModal.vue'
 import { computed, onMounted, ref } from 'vue'
-import { useQuery } from '@vue/apollo-composable'
+import { useQuery, useMutation } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import moment from 'moment'
 import timeUtils from '../utils/timeUtils'
+import stationStates from '../utils/stationStates'
 
 export default {
     props: {
@@ -175,6 +176,20 @@ export default {
             }
         }))
 
+        const isSubmitting = ref(false)
+        const { mutate: updateStation, onDone } = useMutation(gql`
+        mutation StationUpdateById($id: MongoID!, $record: UpdateByIdStationInput!) {
+            stationUpdateById(_id: $id, record: $record) {
+                error {
+                    message
+                }
+            }
+        }`)
+
+        onDone(() => {
+            isSubmitting.value = false
+        })
+
         return { 
             stationReq,
             station,
@@ -183,7 +198,10 @@ export default {
             consoleOptions,
             timeSinceCheckout,
             currentConsole,
-            checkoutModal 
+            isSubmitting,
+            updateStation,
+            updateStationOnDone: onDone,
+            checkoutModal
         }
     },
     created() {
@@ -195,14 +213,14 @@ export default {
     },
     methods: {
         isLoading() {
-            this.stationReq.loading || this.consoleReq.loading
+            this.stationReq.loading || this.consoleReq.loading || this.isSubmitting.value
         },
         showCheckoutModal() {
             this.checkoutModal.show({
                 popFields: true, 
                 defaultTimeUpdateState: true, 
                 defaultUpdateCustomTimeState: false, 
-                stateToUpdateTo: 'CHECKED_OUT'
+                stateToUpdateTo: stationStates.CHECKED_OUT
             })
         },
         showSetFieldsModal() {
@@ -212,10 +230,36 @@ export default {
             })
         },
         checkinStation() {
-            console.log('TODO')
+            this.isSubmitting = true
+            this.updateStation({
+                id: this.stationId,
+                record: {
+                    playerName: '',
+                    currentConsole: null,
+                    currentGame: '',
+                    checkoutTime: null,
+                    status: stationStates.DEFAULT
+                }
+            })
         },
         toggleAvailability() {
-            console.log('TODO')
+            this.isSubmitting = true
+            let newState = stationStates.DEFAULT
+            if (this.station.status !== stationStates.NOT_AVAILABLE) {
+                newState = stationStates.NOT_AVAILABLE
+            } else {
+                if (this.station.checkoutTime) {
+                    newState = stationStates.CHECKED_OUT
+                } else {
+                    newState = stationStates.DEFAULT
+                }
+            }
+            this.updateStation({
+                id: this.stationId,
+                record: {
+                    status: newState
+                }
+            })
         },
         getFormattedTimeFromNow() {
             if (!this.isLoading() && this.station.checkoutTime) {
@@ -223,7 +267,11 @@ export default {
             } else {
                 this.timeSinceCheckout.value = null
             }
-        }
+        },
+        isCheckedOut() {
+            return this.station.status === stationStates.CHECKED_OUT
+        },
+        getStateDisplayName: stationStates.getDisplayName
     },
     components: { StationCheckoutModal }
 }
