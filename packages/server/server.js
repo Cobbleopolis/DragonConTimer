@@ -10,6 +10,7 @@ const GQL_PATH = process.env.GQL_PATH ?? '/gql'
 
 app.use(cors())
 
+mongoose.set('strictQuery', false)
 mongoose.connect('mongodb://dct:test@67.205.180.46:27017/dct')
 
 app.server = http.createServer(app)

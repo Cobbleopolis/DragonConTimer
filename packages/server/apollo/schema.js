@@ -4,12 +4,14 @@ import { composeMongoose } from 'graphql-compose-mongoose'
 
 import ConsoleModel from '../models/Console.js'
 import StationModel  from '../models/Station.js'
+import GlobalSettingModel from '../models/GlobalSetting.js'
 
 const composeOptions = {}
 
 const models = {
     console: ConsoleModel,
-    station: StationModel
+    station: StationModel,
+    globalSetting: GlobalSettingModel
 }
 
 let TypeComposers = {}
