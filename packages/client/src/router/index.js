@@ -21,6 +21,11 @@ const router = createRouter({
             path: '/test',
             name: 'Test',
             component: () => import('../views/TestView.vue')
+        },
+        {
+            path: '/config/globalSettings',
+            name: 'Config: Global Settings',
+            component: () => import('../views/config/GlobalSettingsConfig.vue')
         }
     ],
 })

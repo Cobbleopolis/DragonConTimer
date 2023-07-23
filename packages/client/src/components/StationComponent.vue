@@ -173,6 +173,7 @@ export default {
                 for (let i in tmp) {
                     if (tmp[i]._id == subscriptionData.data.consoleUpdateByIds._id) {
                         tmp[i] = subscriptionData.data.consoleUpdateByIds
+                        break
                     }
                 }
                 return tmp

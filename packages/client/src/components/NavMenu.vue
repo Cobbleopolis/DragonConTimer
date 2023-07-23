@@ -21,6 +21,9 @@
                         </a>
                         <ul class="dropdown-menu m-0">
                             <li>
+                                <RouterLink class="dropdown-item" to="/config/globalSettings">Global Settings</RouterLink>
+                            </li>
+                            <li>
                                 <RouterLink class="dropdown-item" to="/test">Test</RouterLink>
                             </li>
                             <li><a class="dropdown-item" href="#">Action</a></li>
