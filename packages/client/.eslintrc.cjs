@@ -11,7 +11,7 @@ module.exports = {
         ecmaVersion: 'latest',
     },
     rules: {
-        indent: ['error', 4],
+        indent: ['warn', 4],
         'linebreak-style': ['error', 'windows'],
         quotes: ['error', 'single'],
         semi: ['error', 'never'],

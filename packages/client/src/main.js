@@ -49,6 +49,16 @@ const cache = new InMemoryCache({
                     merge(existing, incoming) {
                         return incoming
                     }
+                },
+                console: {
+                    merge(existing, incoming) {
+                        return incoming
+                    }
+                },
+                globalSetting: {
+                    merge(existing, incoming) {
+                        return incoming
+                    }
                 }
             }
         }
