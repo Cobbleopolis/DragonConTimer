@@ -198,15 +198,7 @@ export default {
         const { getSetting } = GlobalSettings()
         const warnTime = getSetting('warnTime')
         const kickTime = getSetting('kickTime')
-        const borderVarient = computed(() => {
-            if(station.value.status === stationStates.NOT_AVAILABLE) {
-                return 'secondary'
-            } else if (station.value.status === stationStates.CHECKED_OUT) {
-                const duration = moment.duration(moment().diff(moment(station.value.checkoutTime)))
-                return 'primary'
-            }
-            return 'default'
-        })
+        const borderVarient = ref('default')
 
         return { 
             stationReq,
@@ -227,11 +219,11 @@ export default {
         }
     },
     created() {
-        this.getFormattedTimeFromNow()
-        setInterval(this.getFormattedTimeFromNow, 1000)
+        this.updateTick()
+        setInterval(this.updateTick, 1000)
     },
     unmounted() {
-        clearInterval(this.getFormattedTimeFromNow)
+        clearInterval(this.updateTick)
     },
     methods: {
         isLoading() {
@@ -283,11 +275,37 @@ export default {
                 }
             })
         },
+        updateTick() {
+            this.getFormattedTimeFromNow()
+            this.updateBorderVarient()
+        },
         getFormattedTimeFromNow() {
             if (!this.isLoading() && this.station.checkoutTime) {
                 this.timeSinceCheckout.value = timeUtils.formatDurationFormat(moment.duration(moment().diff(moment(this.station.checkoutTime))))
             } else {
                 this.timeSinceCheckout.value = null
+            }
+        },
+        updateBorderVarient() {
+            if (this.station !== null) {
+                if(this.station.status === stationStates.NOT_AVAILABLE) {
+                    this.borderVarient = 'secondary'
+                } else if (this.station.status === stationStates.CHECKED_OUT) {
+                    const duration = moment.duration(moment().diff(moment(this.station.checkoutTime))).as('milliseconds')
+                    const kickMillis = moment.duration(this.kickTime.value).as('milliseconds')
+                    const warnMillis = moment.duration(this.warnTime.value).as('milliseconds')
+                    if (duration >= kickMillis) {
+                        this.borderVarient = 'danger'
+                    } else if (duration >= warnMillis) {
+                        this.borderVarient = 'warning'
+                    } else {
+                        this.borderVarient = 'success'
+                    }
+                } else {
+                    this.borderVarient = 'default'
+                }
+            } else {
+                this.borderVarient = 'default'
             }
         },
         isCheckedOut() {
