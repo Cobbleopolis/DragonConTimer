@@ -46,20 +46,29 @@ const cache = new InMemoryCache({
         Query: {
             fields: {
                 station: {
-                    merge(existing, incoming) {
-                        return incoming
-                    }
+                    merge: false
                 },
                 console: {
-                    merge(existing, incoming) {
-                        return incoming
-                    }
+                    merge: false
                 },
                 globalSetting: {
-                    merge(existing, incoming) {
-                        return incoming
-                    }
+                    merge: false
                 }
+                // station: {
+                //     merge(existing, incoming) {
+                //         return incoming
+                //     }
+                // },
+                // console: {
+                //     merge(existing, incoming) {
+                //         return incoming
+                //     }
+                // },
+                // globalSetting: {
+                //     merge(existing, incoming) {
+                //         return incoming
+                //     }
+                // }
             }
         }
     }

@@ -1,10 +1,10 @@
 <template>
-    <div class="card mb-2">
-        <div class="card-header">
-            <span v-if="!isLoading()" >{{ station.name }}&nbsp;({{ getStateDisplayName(station.status) }})</span>
+    <div :class="'card mb-2 border-' + borderVarient">
+        <div :class="'card-header text-bg-' + borderVarient">
+            <span v-if="!isLoading()" >{{ station.name }}&nbsp;({{ stationStates.getDisplayName(station.status) }})</span>
             <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
         </div>
-        <div class="card-body">
+        <div class="card-body" v-if="station.status !== stationStates.NOT_AVAILABLE">
             <p>Console Options: 
                 <span v-if="!isLoading() && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
                 <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
@@ -61,6 +61,7 @@ import gql from 'graphql-tag'
 import moment from 'moment'
 import timeUtils from '../utils/timeUtils'
 import stationStates from '../utils/stationStates'
+import GlobalSettings from '../useables/GlobalSettings'
 
 export default {
     props: {
@@ -194,6 +195,19 @@ export default {
             isSubmitting.value = false
         })
 
+        const { getSetting } = GlobalSettings()
+        const warnTime = getSetting('warnTime')
+        const kickTime = getSetting('kickTime')
+        const borderVarient = computed(() => {
+            if(station.value.status === stationStates.NOT_AVAILABLE) {
+                return 'secondary'
+            } else if (station.value.status === stationStates.CHECKED_OUT) {
+                const duration = moment.duration(moment().diff(moment(station.value.checkoutTime)))
+                return 'primary'
+            }
+            return 'default'
+        })
+
         return { 
             stationReq,
             station,
@@ -205,7 +219,11 @@ export default {
             isSubmitting,
             updateStation,
             updateStationOnDone: onDone,
-            checkoutModal
+            checkoutModal,
+            stationStates,
+            warnTime,
+            kickTime,
+            borderVarient
         }
     },
     created() {
@@ -274,8 +292,7 @@ export default {
         },
         isCheckedOut() {
             return this.station.status === stationStates.CHECKED_OUT
-        },
-        getStateDisplayName: stationStates.getDisplayName
+        }
     },
     components: { StationCheckoutModal }
 }

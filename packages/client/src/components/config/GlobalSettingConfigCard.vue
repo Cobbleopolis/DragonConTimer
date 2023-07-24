@@ -52,7 +52,7 @@ getGlobalSettingReq.onResult((result) => {
 
 getGlobalSettingReq.subscribeToMore({
     document: gql`
-    subscription GlobalSettingChangedById($recordId: MongoID!) {
+    subscription GlobalSettingUpdateById($recordId: MongoID!) {
         globalSettingUpdateById(recordId: $recordId) {
             _id
             name
