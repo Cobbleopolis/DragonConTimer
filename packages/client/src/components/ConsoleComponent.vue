@@ -17,39 +17,29 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import LoadingAnimation from './LoadingAnimation.vue'
 import { computed } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 
-export default {
-    props: {
-        consoleId: String
-    },
-    data() {
-        const consoleReq = useQuery(gql `
-        query ConsoleById($consoleId: MongoID!) {
-            consoleById(_id: $consoleId) {
-                checkoutWarning
-                games {
-                    name
-                    count
-                }
-                name
-            }
-        }`, this.$props)
+const props = defineProps({
+    consoleId: String
+})
 
-        // consoleReq.onResult(res => this.console = res.data['consoleById'])
-
-        const console = computed(() => consoleReq.result.value?.consoleById ?? {})
-
-        return {
-            consoleReq,
-            console,
+const consoleReq = useQuery(gql `
+query ConsoleById($consoleId: MongoID!) {
+    consoleById(_id: $consoleId) {
+        checkoutWarning
+        games {
+            name
+            count
         }
-    },
-    components: { LoadingAnimation }
-}
+        name
+    }
+}`, props)
 
+// consoleReq.onResult(res => this.console = res.data['consoleById'])
+
+const console = computed(() => consoleReq.result.value?.consoleById ?? {})
 </script>
