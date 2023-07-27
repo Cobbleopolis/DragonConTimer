@@ -12,7 +12,7 @@
                         <RouterLink class="nav-link" to="/">Home</RouterLink>
                     </li>
                     <li class="nav-item">
-                        <RouterLink class="nav-link" to="/about">About</RouterLink>
+                        <RouterLink class="nav-link" to="/availability">Availability</RouterLink>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -23,15 +23,6 @@
                             <li>
                                 <RouterLink class="dropdown-item" to="/config/globalSettings">Global Settings</RouterLink>
                             </li>
-                            <li>
-                                <RouterLink class="dropdown-item" to="/test">Test</RouterLink>
-                            </li>
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
