@@ -2,6 +2,8 @@ const DEFAULT = 'DEFAULT'
 const CHECKED_OUT = 'CHECKED_OUT'
 const NOT_AVAILABLE = 'NOT_AVAILABLE'
 
+const allStatesArr = [DEFAULT, CHECKED_OUT, NOT_AVAILABLE]
+
 function getDisplayName(state) {
     if (state === DEFAULT) {
         return 'Default'
@@ -18,5 +20,6 @@ export default {
     DEFAULT,
     CHECKED_OUT,
     NOT_AVAILABLE,
+    allStatesArr,
     getDisplayName
 }

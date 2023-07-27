@@ -6,26 +6,30 @@
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-                <div>
-                    Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images,
-                    lists, etc.
+                <div v-if="!isLoading">
+                    <button class="btn btn-primary" @click="clearFilters">Clear Filters</button>
+                    <form>
+                        <span>States</span>
+                        <div class="form-check form-switch" v-for="state in stationStates.allStatesArr" :key="state">
+                            <input class="form-check-input" type="checkbox" :value="state" role="switch" name="stationStateFilter" :id="'stationStateFilter' + state" v-model="stationStateFilters">
+                            <label class="form-check-label" :for="'stationStateFilter' + state">{{ stationStates.getDisplayName(state) }}</label>
+                        </div>
+                        <span>Console Availability</span>
+                        <div class="form-check form-switch" v-for="console in consoles" :key="console._id">
+                            <input class="form-check-input" type="checkbox" :value="console._id" role="switch" name="consoleAvailabilityFilter" :id="'consoleAvailability' + console._id" v-model="consoleFilters">
+                            <label class="form-check-label" :for="'consoleAvailability' + console._id">{{ console.name }}</label>
+                        </div>
+                    </form>
                 </div>
-                <div class="dropdown mt-3">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        Dropdown button
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
+                <div v-else class="d-flex justify-content-center">
+                    <LoadingAnimation />
                 </div>
             </div>
         </div>
         <template v-if="!isLoading">
             <button class="btn btn-primary mb-2" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilters"
                 aria-controls="offcanvasFilters">Filters</button>
-            <StationComponent :station-id="station._id" v-for="station of stations" :key="station._id" />
+            <StationComponent :station-id="station._id" v-for="station of filteredStations" :key="station._id" />
         </template>
         <template v-else>
             <div class="d-flex justify-content-center">
@@ -36,30 +40,31 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useQuery, useQueryLoading } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import LoadingAnimation from '../components/LoadingAnimation.vue'
 import StationComponent from '../components/StationComponent.vue'
+import stationStates from '../utils/stationStates'
 
 const stationListReq = useQuery(gql`
-        query Query {
-            station {
-                _id
-                consoleOptions
-                status
-            }
-        }`)
+query Query {
+    station {
+        _id
+        consoleOptions
+        status
+    }
+}`)
 
 stationListReq.subscribeToMore({
     document: gql`
-            subscription StationCreate {
-                stationCreate {
-                    _id
-                    consoleOptions
-                    status
-                }
-            }`,
+    subscription StationCreate {
+        stationCreate {
+            _id
+            consoleOptions
+            status
+        }
+    }`,
     updateQuery: (previousResult, { subscriptionData }) => {
         const tmp = structuredClone(previousResult)
         tmp.station = [...tmp.station, subscriptionData.data.stationCreate]
@@ -69,11 +74,11 @@ stationListReq.subscribeToMore({
 
 stationListReq.subscribeToMore({
     document: gql`
-            subscription StationRemove {
-                stationRemove {
-                    _id
-                }
-            }`,
+    subscription StationRemove {
+        stationRemove {
+            _id
+        }
+    }`,
     updateQuery: (previousResult, { subscriptionData }) => {
         if (subscriptionData.data.stationRemove) {
             const tmp = structuredClone(previousResult)
@@ -102,7 +107,28 @@ query Console {
   }
 }`)
 
-const consoles = computed(() => consoleReq.result.value?.station ?? [])
+const consoles = computed(() => consoleReq.result.value?.console ?? [])
+
+const consoleFilters = ref([])
+const stationStateFilters = ref([])
+
+function clearFilters() {
+    consoleFilters.value = []
+    stationStateFilters.value = []
+}
+
+const filteredStations = computed(() => {
+    let filtered = stations.value
+    if (!filtered)
+        return []
+    if (stationStateFilters.value && stationStateFilters.value.length > 0) {
+        filtered = filtered.filter(s => stationStateFilters.value.includes(s.status))
+    }
+    if (consoleFilters.value && consoleFilters.value.length > 0) {
+        filtered = filtered.filter(s => s.consoleOptions.some(co => consoleFilters.value.includes(co)))
+    }
+    return filtered
+})
 
 const isLoading = useQueryLoading()
 </script>
