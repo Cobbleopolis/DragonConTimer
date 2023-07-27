@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@apollo/server": "^4.9.0",
-    "@dct/common": "*",
+    "@dct/common": "^3.0.0-alpha",
     "apollo-datasource-mongodb": "^0.5.4",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
