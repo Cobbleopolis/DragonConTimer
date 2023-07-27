@@ -1,7 +1,7 @@
 {
   "name": "@dct/server",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.0.0-alpha",
   "description": "Timer for DragonCon LAN Gaming",
   "main": "server.js",
   "scripts": {
@@ -14,10 +14,9 @@
   "author": "Cobbleopolis",
   "license": "MIT",
   "dependencies": {
+    "@apollo/server": "^4.9.0",
     "@dct/common": "*",
     "apollo-datasource-mongodb": "^0.5.4",
-    "apollo-server": "^3.10.3",
-    "apollo-server-express": "^3.10.3",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

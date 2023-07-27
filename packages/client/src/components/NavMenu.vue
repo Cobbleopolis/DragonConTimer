@@ -33,6 +33,9 @@
                         <ThemeSwitcher />
                     </li>
                 </ul>
+                <span class="navbar-text">
+                    {{ common.buildinfo.version }}
+                </span>
             </div>
         </div>
     </nav>
@@ -43,4 +46,5 @@
 import { RouterLink } from 'vue-router'
 // eslint-disable-next-line no-unused-vars
 import ThemeSwitcher from './ThemeSwitcher.vue'
+import common from '@dct/common'
 </script>

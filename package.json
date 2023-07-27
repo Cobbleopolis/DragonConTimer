@@ -1,12 +1,12 @@
 {
   "name": "dragoncon-timer",
-  "version": "3.0.0",
+  "version": "3.0.0-alpha",
   "description": "Timer for DragonCon LAN Gaming",
   "main": "server.js",
   "scripts": {
     "dev": "lerna run dev",
     "build": "lerna run build",
-    "build-docker": "",
+    "version": "lerna version",
     "lint": "eslint **/* --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

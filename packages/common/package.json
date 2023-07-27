@@ -5,7 +5,8 @@
   "description": "Common code foor the DrgonCon LAN Gaming timer",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"This package just needs to be copied\""
   },
   "author": "Cobbleopolis",
   "license": "MIT",

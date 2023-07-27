@@ -1,11 +1,13 @@
 import cors from 'cors'
 import mongoose from 'mongoose'
 import http from 'http'
+import bodyParser from 'body-parser'
 
 import 'dotenv/config'
 
 import app from './app.js'
 import apolloServer from './apollo/apolloServer.js'
+import { expressMiddleware } from '@apollo/server/express4'
 
 const PORT = process.env.PORT ?? 9000
 const GQL_PATH = process.env.GQL_PATH ?? '/gql'
@@ -21,10 +23,19 @@ const apollo = apolloServer(app, GQL_PATH)
 
 await apollo.start()
 
-apollo.applyMiddleware({
-    app,
-    path: GQL_PATH
-})
+app.use(
+    GQL_PATH,
+    cors(),
+    bodyParser.json(),
+    expressMiddleware(apollo, {
+        context: async ({ req }) => ({ token: req.headers.token })
+    })
+)
+
+// apollo.applyMiddleware({
+//     app,
+//     path: GQL_PATH
+// })
 
 app.server.listen(PORT, () => {
     console.log(`🍆 Server is listening at http://localhost:${PORT}`)
