@@ -46,6 +46,7 @@ import gql from 'graphql-tag'
 import LoadingAnimation from '../components/LoadingAnimation.vue'
 import StationComponent from '../components/StationComponent.vue'
 import stationStates from '../utils/stationStates'
+import UseUpdateQuery from '../useables/UseUpdateQuery'
 
 const stationListReq = useQuery(gql`
 query Query {
@@ -65,11 +66,7 @@ stationListReq.subscribeToMore({
             status
         }
     }`,
-    updateQuery: (previousResult, { subscriptionData }) => {
-        const tmp = structuredClone(previousResult)
-        tmp.station = [...tmp.station, subscriptionData.data.stationCreate]
-        return tmp
-    }
+    updateQuery: UseUpdateQuery.standardCollectionCreateUpdateQuery('station', 'stationCreate')
 })
 
 stationListReq.subscribeToMore({
@@ -79,22 +76,7 @@ stationListReq.subscribeToMore({
             _id
         }
     }`,
-    updateQuery: (previousResult, { subscriptionData }) => {
-        if (subscriptionData.data.stationRemove) {
-            const tmp = structuredClone(previousResult)
-            let indexToRemove = -1
-            for (let i = 0; i < stations.value.length; i++) {
-                if (stations.value[i]._id === subscriptionData.data?.stationRemove._id) {
-                    indexToRemove = i
-                    break
-                }
-            }
-            if (indexToRemove !== -1) {
-                tmp.station.splice(indexToRemove, 1)
-            }
-            return tmp
-        }
-    }
+    updateQuery: UseUpdateQuery.standardCollectionRemoveUpdateQuery('station', 'stationRemove')
 })
 
 const stations = computed(() => stationListReq.result.value?.station ?? [])
@@ -106,6 +88,39 @@ query Console {
     name
   }
 }`)
+
+consoleReq.subscribeToMore({
+    document: gql`
+    subscription ConsoleUpdate {
+        consoleUpdate {
+            _id
+            name
+        }
+    }`,
+    updateQuery: UseUpdateQuery.standardCollectionUpdateUpdateQuery('console', 'consoleUpdate')
+})
+
+consoleReq.subscribeToMore({
+    document: gql`
+    subscription ConsoleCreate {
+        consoleCreate {
+            _id
+            name
+        }
+    }`,
+    updateQuery: UseUpdateQuery.standardCollectionCreateUpdateQuery('console', 'consoleCreate')
+})
+
+consoleReq.subscribeToMore({
+    document: gql`
+    subscription ConsoleRemove {
+        consoleRemove {
+            _id
+            name
+        }
+    }`,
+    updateQuery: UseUpdateQuery.standardCollectionRemoveUpdateQuery('console', 'consoleRemove')
+})
 
 const consoles = computed(() => consoleReq.result.value?.console ?? [])
 

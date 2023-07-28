@@ -29,6 +29,7 @@
 import { ref, computed } from 'vue'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
+import UseUpdateQuery from '../../useables/UseUpdateQuery'
 
 const props = defineProps({
     settingId: String,
@@ -62,12 +63,7 @@ getGlobalSettingReq.subscribeToMore({
     variables: {
         recordId: props.settingId
     },
-    updateQuery: (previousResult, { subscriptionData }) => {
-        const tmp = structuredClone(previousResult)
-        tmp.globalSettingById.name = subscriptionData.data.globalSettingUpdateById.name
-        tmp.globalSettingById.value = subscriptionData.data.globalSettingUpdateById.value
-        return tmp
-    }
+    updateQuery: UseUpdateQuery.standardUpdateUpdateQuery('globalSettingById', 'globalSettingUpdateById')
 })
 
 const globalSetting = computed(() => getGlobalSettingReq.result.value?.globalSettingById ?? {})

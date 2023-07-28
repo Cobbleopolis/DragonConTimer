@@ -15,6 +15,7 @@ import { ref, computed } from 'vue'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import ConfigSettingConfig from '../../components/config/GlobalSettingConfigCard.vue'
+import UseUpdateQuery from '../../useables/UseUpdateQuery'
 
 const globalSettingReq = useQuery(gql`
 query GlobalSetting($sort: SortFindManyGlobalSettingInput) {
@@ -36,11 +37,7 @@ globalSettingReq.subscribeToMore(() => ({
             value
         }
     }`,
-    updateQuery: (previousResult, { subscriptionData }) => {
-        const tmp = structuredClone(previousResult)
-        tmp.globalSetting = [...tmp.globalSetting, subscriptionData.data.globalSettingCreate]
-        return tmp
-    }
+    updateQuery: UseUpdateQuery.standardCollectionCreateUpdateQuery('globalSetting', 'globalSettingCreate')
 }))
 
 globalSettingReq.subscribeToMore({
@@ -50,11 +47,7 @@ globalSettingReq.subscribeToMore({
             _id
         }
     }`,
-    updateQuery: (previousResult, { subscriptionData }) => {
-        const tmp = structuredClone(previousResult)
-        tmp.globalSetting = tmp.globalSetting.filter(settingObj => settingObj._id !== subscriptionData.data?.globalSettingRemove._id)
-        return tmp
-    }
+    updateQuery: UseUpdateQuery.standardCollectionRemoveUpdateQuery('globalSetting', 'globalSettingRemove')
 })
 
 const globalSettings = computed(() => globalSettingReq.result.value?.globalSetting ?? [])

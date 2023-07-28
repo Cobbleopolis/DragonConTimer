@@ -66,6 +66,7 @@ import moment from 'moment'
 import timeUtils from '../utils/timeUtils'
 import stationStates from '../utils/stationStates'
 import GlobalSettings from '../useables/GlobalSettings'
+import UseUpdateQuery from '../useables/UseUpdateQuery'
 
 const props = defineProps({
     stationId: String
@@ -152,9 +153,7 @@ stationReq.subscribeToMore(() => ({
     variables: {
         recordId: props.stationId
     },
-    updateQuery: (previousResult, { subscriptionData }) => {
-        return { stationById: subscriptionData.data.stationUpdateById }
-    }
+    updateQuery: UseUpdateQuery.standardUpdateUpdateQuery('station', 'stationUpdateById')
 }))
 
 consoleReq.subscribeToMore(() => ({
@@ -173,16 +172,7 @@ consoleReq.subscribeToMore(() => ({
     variables: {
         recordIds: consoleOptions.value?.map(x => x._id)
     },
-    updateQuery: (previousResult, { subscriptionData }) => {
-        const tmp = [...previousResult]
-        for (let i in tmp) {
-            if (tmp[i]._id == subscriptionData.data.consoleUpdateByIds._id) {
-                tmp[i] = subscriptionData.data.consoleUpdateByIds
-                break
-            }
-        }
-        return tmp
-    }
+    updateQuery: UseUpdateQuery.standardCollectionUpdateUpdateQuery('consoleByIds', 'consoleUpdateByIds')
 }))
 
 const isSubmitting = ref(false)
