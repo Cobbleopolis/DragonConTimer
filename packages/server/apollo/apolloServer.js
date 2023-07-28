@@ -25,7 +25,7 @@ export default function(app, path) {
         schema: apolloSchema,
         csrfPrevention: true,
         cache: 'bounded',
-        introspection: process.env.NODE_ENV !== 'production',
+        introspection: true,
         plugins: [
             ApolloServerPluginDrainHttpServer({ httpServer: app.server }),
             {

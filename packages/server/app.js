@@ -9,6 +9,8 @@ const app = express()
 // })
 
 app.use('/', express.static('public'))
+app.use('/availability', express.static('public'))
+app.use('/config/globalSettings', express.static('public'))
 
 app.get('/alive', (req, res) => {
     res.status(200).json({status:"ok"});

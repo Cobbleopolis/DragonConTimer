@@ -27,9 +27,7 @@ app.use(
     GQL_PATH,
     cors(),
     bodyParser.json(),
-    expressMiddleware(apollo, {
-        context: async ({ req }) => ({ token: req.headers.token })
-    })
+    expressMiddleware(apollo)
 )
 
 // apollo.applyMiddleware({

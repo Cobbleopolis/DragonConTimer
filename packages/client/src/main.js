@@ -22,13 +22,16 @@ import * as bootstrap from 'bootstrap'
 
 import Themes from './services/ThemesService'
 
+const httpUrl = import.meta.env.PROD ? window.location.protocol + '//' + window.location.hostname + import.meta.env.VITE_GQL_URL : 'http://' + import.meta.env.VITE_GQL_URL
+const wsUrl = import.meta.env.PROD ? 'ws://' + window.location.hostname + import.meta.env.VITE_GQL_URL : 'ws://' + import.meta.env.VITE_GQL_URL
+
 const httpLink = createHttpLink({
-    uri: 'http://' + import.meta.env.VITE_GQL_URL,
+    uri: httpUrl
 })
 
 const wsLink = new GraphQLWsLink(
     createClient({
-        url: 'ws://' + import.meta.env.VITE_GQL_URL,
+        url: wsUrl
     })
 )
 
