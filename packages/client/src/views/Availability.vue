@@ -5,9 +5,15 @@
         <div class="card mb-2" v-for="console in consoles" :key="console._id">
             <div class="card-header">{{ console.name }}</div>
             <div class="card-body">
-                <div class="d-flex mb-2">
-                    <span v-if="availableConsoleCount[console._id] === 0" >Available in: {{ timeToNextConsole[console._id] }}</span>
+                <div class="mb-4">
+                    <span v-if="availableConsoleCount[console._id] === 0" >
+                        Available in: 
+                        <span v-if="timeToNextConsole[console._id]">{{ timeToNextConsole[console._id] }}</span>
+                        <span v-else class="placeholder col-2"></span>
+                    </span>
                     <span v-else class="me-auto">Availability: {{ availableConsoleCount[console._id] }}/{{ totalConsoleCount[console._id] }}</span>
+                    <br>
+                    <span v-if="stationsToKick[console._id] && stationsToKick[console._id].length > 0">Stations to kick: {{ (stationsToKick[console._id] ?? []).map(x => x.name).join(", ") }}</span>
                 </div>
                 <div class="accordion">
                     <div class="accordion-item">
@@ -17,7 +23,7 @@
                         <div class="collapse" :id="'consoleGameListCollapse-' + console._id">
                             <div class="accordion-body px-0 pt-0 pb-1">
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item" v-for="game in console.games" :key="game.name">
+                                    <li :class="'list-group-item ' + (availableGameCount[console._id + '-' + game.name] === 0 ? 'list-group-item-danger' : '')" v-for="game in console.games" :key="game.name">
                                         <span>{{ game.name }}: {{ availableGameCount[console._id + '-' + game.name] }}/{{ game.count }}</span>
                                     </li>
                                 </ul>
@@ -42,6 +48,7 @@ import UseGlobalSettings from '../useables/UseGlobalSettings'
 import UseUpdateQuery from '../useables/UseUpdateQuery'
 
 onMounted(() => {
+    tickUpdate()
     setInterval(tickUpdate, 1000)
 })
 
@@ -53,6 +60,7 @@ const stationReq = useQuery(gql`
 query Station {
     station {
         _id
+        name
         consoleOptions
         currentConsole
         currentGame
@@ -66,6 +74,7 @@ stationReq.subscribeToMore({
     subscription StationCreate {
         stationCreate {
             _id
+            name
             checkoutTime
             consoleOptions
             currentConsole
@@ -81,6 +90,7 @@ stationReq.subscribeToMore({
     subscription StationUpdate {
         stationUpdate {
             _id
+            name
             checkoutTime
             consoleOptions
             currentConsole
@@ -96,6 +106,7 @@ stationReq.subscribeToMore({
     subscription StationRemove {
         stationRemove {
             _id
+            name
             checkoutTime
             consoleOptions
             currentConsole
@@ -199,13 +210,17 @@ const kickTime = getSetting('kickTime')
 
 const timeToNextConsole = ref({})
 
+const stationsToKick = ref({})
+
 function tickUpdate() {
     updateTimeToNextConsole()
+    updateStationsToKick()
 }
 
 function updateTimeToNextConsole() {
+    const currentTime = moment()
     consoles.value.forEach(c => {
-        let timeToNextConsoleStr = '???'
+        let timeToNextConsoleStr = null
         const checkedOutStationsWithConsole = stations.value.filter(s => s.consoleOptions.includes(c._id) && s.status === stationStates.CHECKED_OUT)
         if (checkedOutStationsWithConsole.length > 0) {
             let oldestCheckoutTime = moment(checkedOutStationsWithConsole[0].checkoutTime)
@@ -216,9 +231,21 @@ function updateTimeToNextConsole() {
                 }
             })
             const availableTime = oldestCheckoutTime.clone().add(moment.duration(kickTime.value.value))
-            timeToNextConsoleStr = timeUtils.formatDurationFormat(moment.duration(availableTime.diff(moment())))
+            timeToNextConsoleStr = timeUtils.formatDurationFormat(moment.duration(availableTime.diff(currentTime)))
         } 
-        timeToNextConsole[c._id] = timeToNextConsoleStr
+        timeToNextConsole.value[c._id] = timeToNextConsoleStr
+    })
+}
+
+function updateStationsToKick() {
+    consoles.value.forEach(c => {
+        stationsToKick.value[c._id] = stations.value.filter(s => {
+            if (!s.consoleOptions.includes(c._id)) {
+                return false
+            }
+            const availableTime = moment(s.checkoutTime).add(moment.duration(kickTime.value.value))
+            return availableTime.isSameOrBefore(moment())
+        })
     })
 }
 </script>
