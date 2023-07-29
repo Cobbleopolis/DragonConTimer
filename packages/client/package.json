@@ -1,0 +1,43 @@
+{
+  "name": "@dct/client",
+  "private": true,
+  "version": "3.0.0-alpha.0",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build --mode production",
+    "preview": "vite preview",
+    "test:unit": "vitest --environment jsdom --root src/",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.7.4",
+    "@dct/common": "^3.0.0-alpha.0",
+    "@popperjs/core": "^2.11.7",
+    "@vue/apollo-composable": "^4.0.0-beta.4",
+    "bootstrap": "^5.3.0-alpha2",
+    "bootstrap-icons": "^1.10.5",
+    "graphql": "^16.6.0",
+    "graphql-tag": "^2.12.6",
+    "graphql-ws": "^5.14.0",
+    "lerna": "^6.6.1",
+    "moment": "^2.29.4",
+    "nodemon": "^2.0.22",
+    "pinia": "^2.0.23",
+    "sass": "^1.60.0",
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.5"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.1.4",
+    "@vitejs/plugin-vue": "^3.1.2",
+    "@vue/cli": "^5.0.8",
+    "@vue/eslint-config-prettier": "^7.0.0",
+    "@vue/test-utils": "^2.1.0",
+    "eslint": "^8.26.0",
+    "eslint-plugin-vue": "^9.3.0",
+    "jsdom": "^20.0.1",
+    "prettier": "^2.7.1",
+    "vite": "^3.1.8",
+    "vitest": "^0.24.3"
+  }
+}

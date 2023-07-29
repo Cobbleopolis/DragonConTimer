@@ -1,13 +1,12 @@
-import { ApolloServer } from 'apollo-server-express'
+import { ApolloServer } from '@apollo/server'
 import schema from './schema.js'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
 import { PubSub } from 'graphql-subscriptions'
 
-import {
-    ApolloServerPluginLandingPageLocalDefault,
-    ApolloServerPluginDrainHttpServer
-} from 'apollo-server-core'
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+
 export default function(app, path) {
 
     const wsServer = new WebSocketServer({
@@ -16,7 +15,7 @@ export default function(app, path) {
         // Pass a different path here if your ApolloServer serves at
         // a different path.
         path,
-    });
+    })
     
     const pubsub = new PubSub()
     const apolloSchema = schema(pubsub)
@@ -26,7 +25,7 @@ export default function(app, path) {
         schema: apolloSchema,
         csrfPrevention: true,
         cache: 'bounded',
-        introspection: process.env.NODE_ENV !== 'production',
+        introspection: true,
         plugins: [
             ApolloServerPluginDrainHttpServer({ httpServer: app.server }),
             {
@@ -42,5 +41,5 @@ export default function(app, path) {
         ]
     })
 
-    return apolloServer;
+    return apolloServer
 }

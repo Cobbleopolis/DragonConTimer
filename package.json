@@ -1,35 +1,28 @@
 {
   "name": "dragoncon-timer",
-  "version": "3.0.0",
+  "version": "3.0.0-alpha",
   "description": "Timer for DragonCon LAN Gaming",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
+    "dev": "lerna run dev",
+    "build": "lerna run build",
+    "version": "lerna version --no-git-tag-version --force-publish",
     "lint": "eslint **/* --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "type": "module",
   "author": "Cobbleopolis",
   "license": "MIT",
-  "dependencies": {
-    "apollo-datasource-mongodb": "^0.5.4",
-    "apollo-server": "^3.10.3",
-    "apollo-server-express": "^3.10.3",
-    "body-parser": "^1.20.1",
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "graphql": "^16.6.0",
-    "graphql-compose": "^9.0.10",
-    "graphql-compose-mongoose": "^9.7.2",
-    "graphql-subscriptions": "^2.0.0",
-    "graphql-ws": "^5.11.2",
-    "mongodb": "^4.11.0",
-    "mongoose": "^6.7.0",
-    "morgan": "^1.10.0",
-    "ws": "^8.10.0"
-  },
+  "private": true,
   "devDependencies": {
+    "@babel/core": "^7.22.9",
+    "@babel/eslint-parser": "^7.22.9",
+    "@babel/plugin-syntax-import-assertions": "^7.22.5",
     "eslint": "^8.26.0",
+    "lerna": "^6.0.3",
     "nodemon": "^2.0.20"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
