@@ -65,7 +65,7 @@ import gql from 'graphql-tag'
 import moment from 'moment'
 import timeUtils from '../utils/timeUtils'
 import stationStates from '../utils/stationStates'
-import GlobalSettings from '../useables/GlobalSettings'
+import UseGlobalSettings from '../useables/UseGlobalSettings'
 import UseUpdateQuery from '../useables/UseUpdateQuery'
 
 const props = defineProps({
@@ -153,7 +153,7 @@ stationReq.subscribeToMore(() => ({
     variables: {
         recordId: props.stationId
     },
-    updateQuery: UseUpdateQuery.standardUpdateUpdateQuery('station', 'stationUpdateById')
+    updateQuery: UseUpdateQuery.standardUpdateUpdateQuery('stationById', 'stationUpdateById')
 }))
 
 consoleReq.subscribeToMore(() => ({
@@ -189,7 +189,7 @@ onDone(() => {
     isSubmitting.value = false
 })
 
-const { getSetting } = GlobalSettings()
+const { getSetting } = UseGlobalSettings()
 const warnTime = getSetting('warnTime')
 const kickTime = getSetting('kickTime')
 const borderVarient = ref('default')
@@ -211,7 +211,7 @@ function showSetFieldsModal() {
 function checkinStation() {
     this.isSubmitting = true
     this.updateStation({
-        id: this.stationId,
+        id: props.stationId,
         record: {
             playerName: '',
             currentConsole: null,
