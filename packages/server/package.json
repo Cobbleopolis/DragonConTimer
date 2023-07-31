@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "build": "copyfiles -e \"./node_modules/**/*\" ./**/* ./dist",
+    "build": "echo \"This package just needs to be copied\"",
     "lint": "eslint **/* --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
