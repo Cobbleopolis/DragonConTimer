@@ -56,7 +56,7 @@ const cache = new InMemoryCache({
                 },
                 globalSetting: {
                     merge: false
-                }
+                },
                 // station: {
                 //     merge(existing, incoming) {
                 //         return incoming
@@ -72,6 +72,13 @@ const cache = new InMemoryCache({
                 //         return incoming
                 //     }
                 // }
+            }
+        },
+        Console: {
+            fields: {
+                games: {
+                    merge: false
+                }
             }
         }
     }

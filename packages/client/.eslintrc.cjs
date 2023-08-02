@@ -12,9 +12,9 @@ module.exports = {
     },
     rules: {
         indent: ['warn', 4],
-        'linebreak-style': ['error', 'windows'],
-        quotes: ['error', 'single'],
-        semi: ['error', 'never'],
+        'linebreak-style': ['warn', 'windows'],
+        quotes: ['warn', 'single'],
+        semi: ['warn', 'never'],
         'no-unused-vars': ['warn']
     },
 }

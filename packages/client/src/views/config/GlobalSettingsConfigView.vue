@@ -4,7 +4,7 @@
         <form>
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="New Setting Name" aria-label="New Setting Name" aria-describedby="button-add" v-model="newSettingName">
-                <button class="btn btn-primary" type="button" id="button-add" @click="createNewSetting">Add</button>
+                <button class="btn btn-primary" type="button" id="button-add" @click="createNewSetting"><i class="bi bi-plus"></i> Add</button>
             </div>
         </form>
     </main>
