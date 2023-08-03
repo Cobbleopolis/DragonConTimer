@@ -7,8 +7,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div v-if="currentSelectedConsole && currentSelectedConsole?.checkoutWarning" class="alert alert-info" role="alert">
-                        <i class="bi bi-info-circle"></i> {{ currentSelectedConsole.checkoutWarning }}
+                    <div v-if="currentSelectedConsole && currentSelectedConsole?.checkoutWarning" class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> {{ currentSelectedConsole.checkoutWarning }}
                     </div>
                     <form>
                         <div class="mb-3">

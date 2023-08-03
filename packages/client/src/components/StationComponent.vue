@@ -34,7 +34,7 @@
             </form>
         </div>
         <ul class="list-group list-group-flush" v-if="station.notes">
-            <li class="list-group-item">Notes: {{ station.notes }}</li>
+            <li class="list-group-item text-primary-emphasis bg-primary-subtle">Notes: {{ station.notes }}</li>
         </ul>
         <div class="card-footer text-body-secondary d-flex flex-wrap align-items-center">
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
@@ -48,11 +48,10 @@
                     <button class="btn btn-info" @click="showSetFieldsModal()"><i class="bi bi-pencil"></i> Set
                         Fields</button>
                     <button class="btn btn-info" @click="toggleAvailability()"><i class="bi bi-toggle-off"></i> Toggle
-                        Availibility</button>
+                        Availability</button>
                 </div>
             </div>
         </div>
-
         <StationCheckoutModal :station="station" :console-options="consoleOptions" ref="checkoutModal" />
     </div>
 </template>

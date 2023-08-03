@@ -6,7 +6,7 @@ const allStatesArr = [DEFAULT, CHECKED_OUT, NOT_AVAILABLE]
 
 function getDisplayName(state) {
     if (state === DEFAULT) {
-        return 'Default'
+        return 'Available'
     } else if (state === CHECKED_OUT) {
         return 'Checked Out'
     } else if (state === NOT_AVAILABLE) {
