@@ -3,11 +3,11 @@
         <template v-if="!loading">
             <!-- <ConsoleConfigCard v-for="console in consoles" :key="console._id" :console-id="console._id"/> -->
             <div class="d-flex flex-column gap-2 mb-2">
-                <StationConfigCard v-for="station in stations" :key="station._id"/>
-            </div>
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="New Station Name" aria-label="New Station Name" aria-describedby="button-add" v-model="newStationName">
-                <button class="btn btn-primary" type="button" id="button-add" @click="createNewConsole"><i class="bi bi-plus"></i> Add</button>
+                <StationConfigCard v-for="station in stations" :key="station._id" :station-id="station._id"/>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="New Station Name" aria-label="New Station Name" aria-describedby="button-add" v-model="newStationName">
+                    <button class="btn btn-primary" type="button" id="button-add" @click="createNewConsole"><i class="bi bi-plus"></i> Add</button>
+                </div>
             </div>
         </template>
         <template v-else>
@@ -33,9 +33,6 @@ const stationReq = useQuery(gql`
 query Station {
     station {
         _id
-        consoleOptions
-        name
-        status
     }
 }`)
 
@@ -44,9 +41,6 @@ stationReq.subscribeToMore({
     subscription StationCreate {
         stationCreate {
             _id
-            consoleOptions
-            name
-            status
         }
     }`,
     updateQuery: UseUpdateQuery.standardCollectionCreateUpdateQuery('station', 'stationCreate')
@@ -57,9 +51,6 @@ stationReq.subscribeToMore({
     subscription StationRemove {
         stationRemove {
             _id
-            consoleOptions
-            name
-            status
         }
     }`,
     updateQuery: UseUpdateQuery.standardCollectionRemoveUpdateQuery('station', 'stationRemove')

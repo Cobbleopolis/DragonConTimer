@@ -5,37 +5,31 @@
                 <span>ID: {{ console._id }}</span>
             </div>
             <div class="card-body">
-                <div>
-                    <div class="mb-2">
-                        <label :for="'stationName' + console._id" class="col-sm-2 col-form-label">Name</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" :id="'stationName' + console._id" v-model="formName">
+                <div class="mb-2">
+                    <label :for="'consoleName' + console._id" class="form-label">Name</label>
+                    <input type="text" class="form-control" :id="'consoleName' + console._id" v-model="formName">
+                </div>
+                <div class="d-flex flex-column flex-md-row gap-2">
+                    <div class="flex-shrink-1">
+                        <label :for="'gameName' + console._id" class="form-label"><span>Games</span></label>
+                        <div class="input-group mb-1" v-for="(game, i) in formGames" :key="console._id + i">
+                            <input type="text" class="form-control" :id="'gameName' + console._id + i" v-model="game.name" placeholder="Game Name">
+                            <input type="number" class="form-control" :id="'gameCount' + console._id + i" v-model="game.count" min="0">
+                            <button class="btn btn-danger" type="button" :id="'buttonDeleteGame' + i" @click="deleteGame(i)"><i class="bi bi-trash"></i> Delete</button>
+                        </div>
+                        <div class="mb-2">
+                            <button class="btn btn-primary" role="button" @click="addGame"><i class="bi bi-plus"></i> Add Game</button>
                         </div>
                     </div>
-                    <div class="d-flex flex-column flex-md-row gap-2">
-                        <div class="flex-shrink-1">
-                            <label :for="'gameName' + console._id" class="col-form-label"><span>Games</span></label>
-                            <div class="input-group mb-1" v-for="(game, i) in formGames" :key="console._id + i">
-                                <input type="text" class="form-control" :id="'gameName' + console._id + i" v-model="game.name" placeholder="Game Name">
-                                <input type="number" class="form-control" :id="'gameCount' + console._id + i" v-model="game.count" min="0">
-                                <button class="btn btn-danger" type="button" :id="'buttonDeleteGame' + i" @click="deleteGame(i)"><i class="bi bi-trash"></i> Delete</button>
-                            </div>
-                            <div class="mb-2">
-                                <button class="btn btn-primary" role="button" @click="addGame"><i class="bi bi-plus"></i> Add Game</button>
-                            </div>
-                        </div>
-                        <!-- Eventually extras should go here -->
-                    </div>
-                    <div class="mb-4">
-                        <label :for="'checkoutWarning' + console._id" class="col-sm-2 col-form-label">Checkout Warning</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" :id="'checkoutWarning' + console._id" v-model="formCheckoutWarning">
-                        </div>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-success" @click="saveClick"><i class="bi bi-save"></i> Save</button>
-                        <button class="btn btn-danger" @click="deleteClick"><i class="bi bi-trash"></i> Delete</button>
-                    </div>
+                    <!-- Eventually extras should go here -->
+                </div>
+                <div class="mb-4">
+                    <label :for="'checkoutWarning' + console._id" class="form-label">Checkout Warning</label>
+                    <input type="text" class="form-control" :id="'checkoutWarning' + console._id" v-model="formCheckoutWarning">
+                </div>
+                <div class="btn-group" role="group">
+                    <button class="btn btn-success" @click="saveClick"><i class="bi bi-save"></i> Save</button>
+                    <button class="btn btn-danger" @click="deleteClick"><i class="bi bi-trash"></i> Delete</button>
                 </div>
             </div>
         </template>
@@ -114,11 +108,11 @@ const formCheckoutWarning = ref(console.value.checkoutWarning)
 
 const { mutate: updateConsole, onDone: onUpdateDone } = useMutation(gql`
 mutation ConsoleUpdateById($id: MongoID!, $record: UpdateByIdConsoleInput!) {
-  consoleUpdateById(_id: $id, record: $record) {
-    error {
-      message
+    consoleUpdateById(_id: $id, record: $record) {
+        error {
+            message
+        }
     }
-  }
 }`)
 
 onUpdateDone(() => {
@@ -127,11 +121,11 @@ onUpdateDone(() => {
 
 const { mutate: deleteConsole } = useMutation(gql`
 mutation ConsoleRemoveById($id: MongoID!) {
-  consoleRemoveById(_id: $id) {
-    error {
-      message
+    consoleRemoveById(_id: $id) {
+        error {
+            message
+        }
     }
-  }
 }`)
 
 function saveClick() {

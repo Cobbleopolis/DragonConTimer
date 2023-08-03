@@ -26,6 +26,9 @@
                             <li>
                                 <RouterLink class="dropdown-item" to="/config/consoles">Consoles</RouterLink>
                             </li>
+                            <li>
+                                <RouterLink class="dropdown-item" to="/config/stations">Stations</RouterLink>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">

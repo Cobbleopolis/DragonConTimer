@@ -26,6 +26,11 @@ const router = createRouter({
             path: '/config/consoles',
             name: 'Config: Consoles',
             component: () => import('../views/config/ConsoleConfigView.vue')
+        },
+        {
+            path: '/config/stations',
+            name: 'Config: Stations',
+            component: () => import('../views/config/StationConfigView.vue')
         }
     ],
 })
