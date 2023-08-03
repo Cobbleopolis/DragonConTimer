@@ -256,9 +256,9 @@ function updateBorderVarient() {
         if (station.value.status === stationStates.NOT_AVAILABLE) {
             borderVarient.value = 'secondary'
         } else if (station.value.status === stationStates.CHECKED_OUT) {
-            const duration = moment.duration(moment().diff(moment(station.value.checkoutTime))).as('milliseconds')
-            const kickMillis = moment.duration(kickTime.value).as('milliseconds')
-            const warnMillis = moment.duration(warnTime.value).as('milliseconds')
+            const duration = moment.duration(moment().diff(moment(station.value.checkoutTime))).asMilliseconds()
+            const kickMillis = moment.duration(kickTime.value.value).asMilliseconds()
+            const warnMillis = moment.duration(warnTime.value.value).asMilliseconds()
             if (duration >= kickMillis) {
                 borderVarient.value = 'danger'
             } else if (duration >= warnMillis) {
