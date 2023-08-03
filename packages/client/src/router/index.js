@@ -20,7 +20,17 @@ const router = createRouter({
         {
             path: '/config/globalSettings',
             name: 'Config: Global Settings',
-            component: () => import('../views/config/GlobalSettingsConfig.vue')
+            component: () => import('../views/config/GlobalSettingsConfigView.vue')
+        },
+        {
+            path: '/config/consoles',
+            name: 'Config: Consoles',
+            component: () => import('../views/config/ConsoleConfigView.vue')
+        },
+        {
+            path: '/config/stations',
+            name: 'Config: Stations',
+            component: () => import('../views/config/StationConfigView.vue')
         }
     ],
 })

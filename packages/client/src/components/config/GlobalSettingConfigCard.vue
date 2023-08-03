@@ -1,5 +1,8 @@
 <template>
     <div :class="'card border-' + borderVarient">
+        <div :class="'card-header text-bg-' + borderVarient">
+            <span>ID: {{  settingId }}</span>
+        </div>
         <div class="card-body">
             <form>
                 <div class="row g-3">
