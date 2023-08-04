@@ -34,6 +34,9 @@ import { useQuery, useMutation } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import UseUpdateQuery from '../../useables/UseUpdateQuery'
 
+import {useToast} from 'vue-toast-notification'
+const toast = useToast()
+
 const props = defineProps({
     settingId: String,
 })
@@ -102,7 +105,7 @@ const borderVarient = ref('default')
 //     settingValue.value = props.settingObj.value
 // })
 
-const { mutate: updateGlobalSetting, loading: updateLoading, onDone: onUpdateDone } = useMutation(gql`
+const { mutate: updateGlobalSetting, loading: updateLoading, onDone: onUpdateDone, onError: onUpdateError } = useMutation(gql`
 mutation GlobalSettingUpdateById($id: MongoID!, $record: UpdateByIdGlobalSettingInput!) {
     globalSettingUpdateById(_id: $id, record: $record) {
         error {
@@ -113,9 +116,15 @@ mutation GlobalSettingUpdateById($id: MongoID!, $record: UpdateByIdGlobalSetting
 
 onUpdateDone(() => {
     setBorderVarient('success')
+    toast.success('Successfully saved the global setting')
 })
 
-const { mutate: deleteGlobalSetting, loading: removeLoading } = useMutation(gql`
+onUpdateError((error) => {
+    toast.danger('Error saving the global setting')
+    console.error(error)
+})
+
+const { mutate: deleteGlobalSetting, loading: removeLoading, onError: onDeleteError } = useMutation(gql`
 mutation GlobalSettingRemoveById($id: MongoID!) {
     globalSettingRemoveById(_id: $id) {
         error {
@@ -123,6 +132,11 @@ mutation GlobalSettingRemoveById($id: MongoID!) {
         }
     }
 }`)
+
+onDeleteError((error) => {
+    toast.danger('Error deleting the global setting')
+    console.error(error)
+})
 
 function isLoading() {
     return updateLoading || removeLoading

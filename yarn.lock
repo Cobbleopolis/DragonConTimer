@@ -11588,6 +11588,11 @@ vue-router@^4.1.5:
   dependencies:
     "@vue/devtools-api" "^6.4.5"
 
+vue-toast-notification@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/vue-toast-notification/-/vue-toast-notification-3.1.1.tgz#334e9e71996c884a58c70a0fa011424f767d87bb"
+  integrity sha512-DXEE38NxXFCNinKI+MyZBMWsaqE9Lwxg9GkMVkzKXY1ACCeNztBXuUiSvKMe36dnnYd1qnlP+cWNSvHlkt5xNA==
+
 vue@^2.6.14:
   version "2.7.14"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.7.14.tgz#3743dcd248fd3a34d421ae456b864a0246bafb17"

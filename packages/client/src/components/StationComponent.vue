@@ -67,6 +67,9 @@ import stationStates from '../utils/stationStates'
 import UseGlobalSettings from '../useables/UseGlobalSettings'
 import UseUpdateQuery from '../useables/UseUpdateQuery'
 
+import {useToast} from 'vue-toast-notification'
+const toast = useToast()
+
 const props = defineProps({
     stationId: String
 })
@@ -175,7 +178,7 @@ consoleReq.subscribeToMore(() => ({
 }))
 
 const isSubmitting = ref(false)
-const { mutate: updateStation, onDone } = useMutation(gql`
+const { mutate: updateStation, onDone, onError } = useMutation(gql`
 mutation StationUpdateById($id: MongoID!, $record: UpdateByIdStationInput!) {
     stationUpdateById(_id: $id, record: $record) {
         error {
@@ -186,6 +189,12 @@ mutation StationUpdateById($id: MongoID!, $record: UpdateByIdStationInput!) {
 
 onDone(() => {
     isSubmitting.value = false
+})
+
+onError((error) => {
+    isSubmitting.value = false
+    toast.error('Error updating the station')
+    console.error(error)
 })
 
 const { getSetting } = UseGlobalSettings()
@@ -259,8 +268,14 @@ function updateBorderVarient() {
             const kickMillis = moment.duration(kickTime.value.value).asMilliseconds()
             const warnMillis = moment.duration(warnTime.value.value).asMilliseconds()
             if (duration >= kickMillis) {
+                if (borderVarient.value != 'danger') {
+                    toast.error(station.value.name + ' needs to be kicked')
+                }
                 borderVarient.value = 'danger'
             } else if (duration >= warnMillis) {
+                if (borderVarient.value != 'warning') {
+                    toast.warning(station.value.name + ' has ' + moment.duration(moment().diff(moment(station.value.checkoutTime).add(kickMillis, 'millisecond'))).humanize() + ' left')
+                }
                 borderVarient.value = 'warning'
             } else {
                 borderVarient.value = 'success'

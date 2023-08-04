@@ -83,6 +83,9 @@ import gql from 'graphql-tag'
 import * as bootstrap from 'bootstrap'
 import moment from 'moment'
 
+import {useToast} from 'vue-toast-notification'
+const toast = useToast()
+
 const props = defineProps({
     station: Object,
     consoleOptions: Array
@@ -166,7 +169,7 @@ function isVisible() {
     return modalRoot.value && (modalRoot.value.hasClass('in') || modalRoot.value.hasClass('show'))
 }
 
-const { mutate: updateStation, onDone } = useMutation(gql`
+const { mutate: updateStation, onDone, onError } = useMutation(gql`
     mutation StationUpdateById($id: MongoID!, $record: UpdateByIdStationInput!) {
         stationUpdateById(_id: $id, record: $record) {
             error {
@@ -178,6 +181,12 @@ const { mutate: updateStation, onDone } = useMutation(gql`
 onDone(() => {
     isSubmitting.value = false
     _hide()
+})
+
+onError((error) => {
+    isSubmitting.value = false
+    toast.error('Error updating the station')
+    console.error(error)
 })
 
 function submitForm() {

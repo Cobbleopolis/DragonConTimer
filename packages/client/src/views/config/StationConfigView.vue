@@ -27,6 +27,9 @@ import LoadingAnimation from '../../components/LoadingAnimation.vue'
 import stationStates from '../../utils/stationStates'
 import StationConfigCard from '../../components/config/StationConfigCard.vue'
 
+import {useToast} from 'vue-toast-notification'
+const toast = useToast()
+
 const loading = useQueryLoading()
 
 const stationReq = useQuery(gql`
@@ -62,7 +65,7 @@ const stations = computed(() => stationReq.result.value?.station ?? [])
 
 const newStationName = ref('')
 
-const { mutate: createConsole, onDone: createConsoleDone } = useMutation(gql`
+const { mutate: createConsole, onDone: createConsoleDone, onError: createConsoleError } = useMutation(gql`
 mutation StationCreate($record: CreateOneStationInput!) {
   stationCreate(record: $record) {
     error {
@@ -73,6 +76,11 @@ mutation StationCreate($record: CreateOneStationInput!) {
 
 createConsoleDone(() => {
     newStationName.value = ''
+})
+
+createConsoleError((error) => {
+    toast.error('Error creating a new station')
+    console.error(error)
 })
 
 function createNewConsole() {
