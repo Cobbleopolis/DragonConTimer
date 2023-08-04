@@ -1,6 +1,6 @@
 {
   "name": "dragoncon-timer",
-  "version": "3.0.0-alpha.1",
+  "version": "3.0.0-alpha.2",
   "description": "Timer for DragonCon LAN Gaming",
   "main": "server.js",
   "scripts": {
