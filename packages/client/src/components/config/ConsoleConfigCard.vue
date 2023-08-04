@@ -27,9 +27,13 @@
                     <label :for="'checkoutWarning' + console._id" class="form-label">Checkout Warning</label>
                     <input type="text" class="form-control" :id="'checkoutWarning' + console._id" v-model="formCheckoutWarning">
                 </div>
-                <div class="btn-group" role="group">
-                    <button class="btn btn-success" @click="saveClick"><i class="bi bi-save"></i> Save</button>
-                    <button class="btn btn-danger" @click="deleteClick"><i class="bi bi-trash"></i> Delete</button>
+            </div>
+            <div class="card-footer">
+                <div class="btn-toolbar" role="toolbar" aria-label="Operation buttons for this console">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-success" @click="saveClick"><i class="bi bi-save"></i> Save</button>
+                        <button class="btn btn-danger" @click="deleteClick"><i class="bi bi-trash"></i> Delete</button>
+                    </div>
                 </div>
             </div>
         </template>

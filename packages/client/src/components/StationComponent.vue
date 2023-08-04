@@ -34,7 +34,7 @@
             </form>
         </div>
         <ul class="list-group list-group-flush" v-if="station.notes">
-            <li class="list-group-item">Notes: {{ station.notes }}</li>
+            <li class="list-group-item text-primary-emphasis bg-primary-subtle">Notes: {{ station.notes }}</li>
         </ul>
         <div class="card-footer text-body-secondary d-flex flex-wrap align-items-center">
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
@@ -48,11 +48,10 @@
                     <button class="btn btn-info" @click="showSetFieldsModal()"><i class="bi bi-pencil"></i> Set
                         Fields</button>
                     <button class="btn btn-info" @click="toggleAvailability()"><i class="bi bi-toggle-off"></i> Toggle
-                        Availibility</button>
+                        Availability</button>
                 </div>
             </div>
         </div>
-
         <StationCheckoutModal :station="station" :console-options="consoleOptions" ref="checkoutModal" />
     </div>
 </template>
@@ -256,9 +255,9 @@ function updateBorderVarient() {
         if (station.value.status === stationStates.NOT_AVAILABLE) {
             borderVarient.value = 'secondary'
         } else if (station.value.status === stationStates.CHECKED_OUT) {
-            const duration = moment.duration(moment().diff(moment(station.value.checkoutTime))).as('milliseconds')
-            const kickMillis = moment.duration(kickTime.value).as('milliseconds')
-            const warnMillis = moment.duration(warnTime.value).as('milliseconds')
+            const duration = moment.duration(moment().diff(moment(station.value.checkoutTime))).asMilliseconds()
+            const kickMillis = moment.duration(kickTime.value.value).asMilliseconds()
+            const warnMillis = moment.duration(warnTime.value.value).asMilliseconds()
             if (duration >= kickMillis) {
                 borderVarient.value = 'danger'
             } else if (duration >= warnMillis) {

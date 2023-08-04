@@ -7,35 +7,31 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div v-if="currentSelectedConsole && currentSelectedConsole?.checkoutWarning" class="alert alert-info" role="alert">
-                        <i class="bi bi-info-circle"></i> {{ currentSelectedConsole.checkoutWarning }}
+                    <div v-if="currentSelectedConsole && currentSelectedConsole?.checkoutWarning" class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> {{ currentSelectedConsole.checkoutWarning }}
                     </div>
                     <form>
                         <div class="mb-3">
-                            <label id="playerNameLabel" class="form-label" for="playerNameInput">Player Name</label>
-                            <input type="text" class="form-control" id="playerNameInput" name="playerName" aria-describedby="playerNameHelp" placeholder="John Doe" v-model="currentPlayerName"/>
-                            <div id="playerNameHelp" class="form-text">The name of the person checking out the station</div>
+                            <label :id="'playerNameLabel' + station._id" class="form-label" :for="'playerNameInput' + station._id">Player Name</label>
+                            <input type="text" class="form-control" :id="'playerNameInput' + station._id" name="playerName" :aria-describedby="'playerNameHelp' + station._id" placeholder="John Doe" v-model="currentPlayerName"/>
+                            <div :id="'playerNameHelp' + station._id" class="form-text">The name of the person checking out the station</div>
                         </div>
                         <p>Console Options: {{ consoleOptions.length }}</p>
                         <div class="mb-3">
-                            <label id="consoleOptionLabel" class="form-label" for="consoleOptionInput">Console</label>
-                            <select class="form-select" id="consoleOptionInput" aria-labelledby="consoleOptionLabel" aria-describedby="consoleOptionHelp" v-model="currentConsole" @change="updateCurrentConsoleObj()">
+                            <label :id="'consoleOptionLabel' + station._id" class="form-label" :for="'consoleOptionInput' + station._id">Console</label>
+                            <select class="form-select" :id="'consoleOptionInput' + station._id" :aria-labelledby="'consoleOptionLabel' + station._id" :aria-describedby="'consoleOptionHelp' + station._id" v-model="currentConsole" @change="updateCurrentConsoleObj()">
                                 <option disabled hidden :value="''" :selected="currentConsole == ''">Select Console</option>
                                 <option v-for="console in consoleOptions" :value="console._id" :key="console._id" :selected="currentConsole == console._id">{{ console.name }}</option>
                             </select>
-                            <div id="consoleOptionHelp" class="form-text">The console they're going to play</div>
+                            <div :id="'consoleOptionHelp' + station._id" class="form-text">The console they're going to play</div>
                         </div>
                         <div class="mb-3">
-                            <label id="gameOptionLabel" class="form-label" for="gameOptionInput">Game</label>
-                            <!-- <select class="form-select" id="gameOptionInput" aria-labelledby="gameOptionLabel" aria-describedby="gameOptionHelp" v-model="currentGame">
-                                <option disabled hidden :value="''" :selected="currentGame == ''"> Select Game</option>
-                                <option v-for="game in currentSelectedConsole?.games ?? []" :value="game.name" :key="game.name" :selected="currentGame.value == game.name || currentSelectedConsole.length === 1">{{ game.name }}</option>
-                            </select> -->
+                            <label :id="'gameOptionLabel' + station._id" class="form-label" :for="'gameOptionInput' + station._id">Game</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" id="gameOptionInput" list="gameOptionsDatalist" aria-labelledby="gameOptionLabel" aria-describedby="gameOptionHelp" autocomplete="off" placeholder="Game" v-model="currentGame">
+                                <input type="text" class="form-control" :id="'gameOptionInput' + station._id" :list="'gameOptionsDatalist' + station._id" :aria-labelledby="'gameOptionLabel' + station._id" :aria-describedby="'gameOptionHelp' + station._id" autocomplete="off" placeholder="Game" v-model="currentGame">
                                 <button class="btn btn-outline-danger" type="button" @click="currentGame = ''"><i class="bi bi-x"></i></button>
                             </div>
-                            <datalist id="gameOptionsDatalist">
+                            <datalist :id="'gameOptionsDatalist' + station._id">
                                 <option v-for="game in currentSelectedConsole?.games ?? []" :key="game.name">{{ game.name }}</option>
                             </datalist>
                             <div id="gameOptionHelp" class="form-text">
@@ -60,10 +56,6 @@
                                 <input type="datetime-local" class="form-control" aria-label="Custom Time" :disabled="!useCustomTime" v-model="customTime">
                                 <button class="btn btn-outline-secondary" type="button" id="customTimeNowButton" @click="setCustomTime(moment())" :disabled="!useCustomTime">Now</button>
                             </div>
-                            <!-- <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="useCustomTimeInput" v-model="useCustomTime">
-                                <label class="form-check-label" id="useCustomTimeLabel" for="useCustomTimeInput">Use Custom Time</label>
-                            </div> -->
                         </div>
                         <div class="mt-2 mb-3">
                             <label id="stationNotesLabel" class="form-label" for="stationNotesInput">Station Notes</label>
