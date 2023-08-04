@@ -1,3 +1,4 @@
+import fs from 'fs'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import http from 'http'
@@ -14,8 +15,17 @@ const GQL_PATH = process.env.GQL_PATH ?? '/gql'
 
 app.use(cors())
 
+let connectionString = process.env.DB_CONNECTION_STRING
+if(process.env.DB_CONNECTION_STRING_FILE) {
+    try {
+        connectionString = fs.readFileSync(process.env.DB_CONNECTION_STRING_FILE, 'utf-8')
+    } catch (err) {
+        console.error(err)
+    }
+}
+
 mongoose.set('strictQuery', false)
-mongoose.connect(process.env.DB_CONNECTION_STRING)
+mongoose.connect(connectionString)
 
 app.server = http.createServer(app)
 
