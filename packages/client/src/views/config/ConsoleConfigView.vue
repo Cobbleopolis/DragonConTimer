@@ -23,6 +23,9 @@ import UseUpdateQuery from '../../useables/UseUpdateQuery'
 import LoadingAnimation from '../../components/LoadingAnimation.vue'
 import ConsoleConfigCard from '../../components/config/ConsoleConfigCard.vue'
 
+import {useToast} from 'vue-toast-notification'
+const toast = useToast()
+
 const consoleReq = useQuery(gql`
 query Console {
     console {
@@ -74,7 +77,7 @@ const loading = useQueryLoading()
 
 const newConsoleName = ref('')
 
-const { mutate: createConsole, onDone: createConsoleDone } = useMutation(gql`
+const { mutate: createConsole, onDone: createConsoleDone, onError: createConsoleError } = useMutation(gql`
 mutation ConsoleCreate($record: CreateOneConsoleInput!) {
   consoleCreate(record: $record) {
     error {
@@ -85,6 +88,11 @@ mutation ConsoleCreate($record: CreateOneConsoleInput!) {
 
 createConsoleDone(() => {
     newConsoleName.value = ''
+})
+
+createConsoleError((error) => {
+    toast.error('Error creating a new console')
+    console.error(error)
 })
 
 function createNewConsole() {

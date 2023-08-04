@@ -15,6 +15,11 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from '@apollo/client/utilities'
 
+import ToastPlugin from 'vue-toast-notification'
+const toastOptions = {
+    position: 'top-right'
+}
+
 // import './assets/main.css'
 import './styles/main.sass'
 // eslint-disable-next-line no-unused-vars
@@ -100,6 +105,7 @@ const app = createApp({
 // app.use(VueApollo)
 app.use(createPinia())
 app.use(router)
+app.use(ToastPlugin, toastOptions)
 
 app.config.globalProperties.$themes = new Themes()
 

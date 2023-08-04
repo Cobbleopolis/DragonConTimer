@@ -2,19 +2,19 @@
     <div :class="'card border-' + borderVarient">
         <template v-if="!loading">
             <div :class="'card-header text-bg-' + borderVarient">
-                <span>ID: {{ console._id }}</span>
+                <span>ID: {{ consoleObj._id }}</span>
             </div>
             <div class="card-body">
                 <div class="mb-2">
-                    <label :for="'consoleName' + console._id" class="form-label">Name</label>
-                    <input type="text" class="form-control" :id="'consoleName' + console._id" v-model="formName">
+                    <label :for="'consoleName' + consoleObj._id" class="form-label">Name</label>
+                    <input type="text" class="form-control" :id="'consoleName' + consoleObj._id" v-model="formName">
                 </div>
                 <div class="d-flex flex-column flex-md-row gap-2">
                     <div class="flex-shrink-1">
-                        <label :for="'gameName' + console._id" class="form-label"><span>Games</span></label>
-                        <div class="input-group mb-1" v-for="(game, i) in formGames" :key="console._id + i">
-                            <input type="text" class="form-control" :id="'gameName' + console._id + i" v-model="game.name" placeholder="Game Name">
-                            <input type="number" class="form-control" :id="'gameCount' + console._id + i" v-model="game.count" min="0">
+                        <label :for="'gameName' + consoleObj._id" class="form-label"><span>Games</span></label>
+                        <div class="input-group mb-1" v-for="(game, i) in formGames" :key="consoleObj._id + i">
+                            <input type="text" class="form-control" :id="'gameName' + consoleObj._id + i" v-model="game.name" placeholder="Game Name">
+                            <input type="number" class="form-control" :id="'gameCount' + consoleObj._id + i" v-model="game.count" min="0">
                             <button class="btn btn-danger" type="button" :id="'buttonDeleteGame' + i" @click="deleteGame(i)"><i class="bi bi-trash"></i> Delete</button>
                         </div>
                         <div class="mb-2">
@@ -24,8 +24,8 @@
                     <!-- Eventually extras should go here -->
                 </div>
                 <div class="mb-4">
-                    <label :for="'checkoutWarning' + console._id" class="form-label">Checkout Warning</label>
-                    <input type="text" class="form-control" :id="'checkoutWarning' + console._id" v-model="formCheckoutWarning">
+                    <label :for="'checkoutWarning' + consoleObj._id" class="form-label">Checkout Warning</label>
+                    <input type="text" class="form-control" :id="'checkoutWarning' + consoleObj._id" v-model="formCheckoutWarning">
                 </div>
             </div>
             <div class="card-footer">
@@ -55,6 +55,8 @@ import gql from 'graphql-tag'
 import UseUpdateQuery from '../../useables/UseUpdateQuery'
 import LoadingAnimation from '../../components/LoadingAnimation.vue'
 
+import {useToast} from 'vue-toast-notification'
+const toast = useToast()
 
 const props = defineProps({
     consoleId: String
@@ -103,14 +105,14 @@ consoleReq.onResult((result) => {
     formCheckoutWarning.value = result.data.consoleById.checkoutWarning
 })
 
-const console = computed(() => consoleReq.result.value?.consoleById ?? {})
+const consoleObj = computed(() => consoleReq.result.value?.consoleById ?? {})
 
-const formName = ref(console.value.name)
+const formName = ref(consoleObj.value.name)
 // eslint-disable-next-line no-unused-vars
-const formGames = ref(console.value.games)
-const formCheckoutWarning = ref(console.value.checkoutWarning)
+const formGames = ref(consoleObj.value.games)
+const formCheckoutWarning = ref(consoleObj.value.checkoutWarning)
 
-const { mutate: updateConsole, onDone: onUpdateDone } = useMutation(gql`
+const { mutate: updateConsole, onDone: onUpdateDone, onError: onUpdateError } = useMutation(gql`
 mutation ConsoleUpdateById($id: MongoID!, $record: UpdateByIdConsoleInput!) {
     consoleUpdateById(_id: $id, record: $record) {
         error {
@@ -121,9 +123,15 @@ mutation ConsoleUpdateById($id: MongoID!, $record: UpdateByIdConsoleInput!) {
 
 onUpdateDone(() => {
     setBorderVarient('success')
+    toast.success('Successfully saved the console')
 })
 
-const { mutate: deleteConsole } = useMutation(gql`
+onUpdateError((error) => {
+    toast.error('Error saving the console')
+    console.error(error)
+})
+
+const { mutate: deleteConsole, onError: onDeleteError } = useMutation(gql`
 mutation ConsoleRemoveById($id: MongoID!) {
     consoleRemoveById(_id: $id) {
         error {
@@ -131,6 +139,11 @@ mutation ConsoleRemoveById($id: MongoID!) {
         }
     }
 }`)
+
+onDeleteError((error) => {
+    toast.error('Error deleting the console')
+    console.error(error)
+})
 
 function saveClick() {
     updateConsole({

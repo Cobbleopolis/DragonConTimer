@@ -44,6 +44,9 @@ import gql from 'graphql-tag'
 import UseUpdateQuery from '../../useables/UseUpdateQuery'
 import LoadingAnimation from '../../components/LoadingAnimation.vue'
 
+import {useToast} from 'vue-toast-notification'
+const toast = useToast()
+
 const props = defineProps({
     stationId: String
 })
@@ -129,7 +132,7 @@ const consoles = computed(() => consoleReq.result.value?.console ?? {})
 const formName = ref(station.value.name)
 const formConsoleOptions = ref(station.value.consoleOptions)
 
-const { mutate: updateStation, onDone: onUpdateDone } = useMutation(gql`
+const { mutate: updateStation, onDone: onUpdateDone, onError: onUpdateError } = useMutation(gql`
 mutation Mutation($id: MongoID!, $record: UpdateByIdStationInput!) {
     stationUpdateById(_id: $id, record: $record) {
         error {
@@ -140,9 +143,15 @@ mutation Mutation($id: MongoID!, $record: UpdateByIdStationInput!) {
 
 onUpdateDone(() => {
     setBorderVarient('success')
+    toast.success('Successfully saved the station')
 })
 
-const { mutate: deleteStation } = useMutation(gql`
+onUpdateError((error) => {
+    toast.error('Error saving the station')
+    console.error(error)
+})
+
+const { mutate: deleteStation, onError: onDeleteError} = useMutation(gql`
 mutation StationRemoveById($id: MongoID!) {
     stationRemoveById(_id: $id) {
         error {
@@ -150,6 +159,11 @@ mutation StationRemoveById($id: MongoID!) {
         }
     }
 }`)
+
+onDeleteError((error) => {
+    toast.error('Error deleting the station')
+    console.error(error)
+})
 
 function saveClick() {
     updateStation({

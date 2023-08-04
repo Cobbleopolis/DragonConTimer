@@ -17,6 +17,9 @@ import gql from 'graphql-tag'
 import ConfigSettingConfig from '../../components/config/GlobalSettingConfigCard.vue'
 import UseUpdateQuery from '../../useables/UseUpdateQuery'
 
+import {useToast} from 'vue-toast-notification'
+const toast = useToast()
+
 const globalSettingReq = useQuery(gql`
 query GlobalSetting($sort: SortFindManyGlobalSettingInput) {
     globalSetting(sort: $sort) {
@@ -54,7 +57,7 @@ const globalSettings = computed(() => globalSettingReq.result.value?.globalSetti
 
 const newSettingName = ref('')
 
-const { mutate: createGlobalSetting } = useMutation(gql`
+const { mutate: createGlobalSetting, onDone: onGlobalSettingsDone, onError: onGlobalSettingsError } = useMutation(gql`
 mutation GlobalSettingCreate($record: CreateOneGlobalSettingInput!) {
     globalSettingCreate(record: $record) {
         record {
@@ -64,6 +67,15 @@ mutation GlobalSettingCreate($record: CreateOneGlobalSettingInput!) {
         }
     }
 }`)
+
+onGlobalSettingsDone(() => {
+    newSettingName.value = ''
+})
+
+onGlobalSettingsError((error) => {
+    toast.error('Error creating a new global setting')
+    console.error(error)
+})
 
 function createNewSetting() {
     createGlobalSetting({
