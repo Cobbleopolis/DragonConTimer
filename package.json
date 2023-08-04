@@ -1,12 +1,12 @@
 {
   "name": "dragoncon-timer",
-  "version": "3.0.0-alpha",
+  "version": "3.0.0-alpha.1",
   "description": "Timer for DragonCon LAN Gaming",
   "main": "server.js",
   "scripts": {
     "dev": "lerna run dev",
     "build": "lerna run build",
-    "version": "lerna version --no-git-tag-version --force-publish",
+    "version": "lerna version --no-git-tag-version --force-publish --no-push",
     "lint": "eslint **/* --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +23,7 @@
     "nodemon": "^2.0.20"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "./."
   ]
 }
