@@ -21,6 +21,22 @@ export default mongoose.model('Station', {
         type: mongoose.Types.ObjectId,
         required: false
     },
+    currentExtras: {
+        type: [
+            {
+                _id: false,
+                extraId: {
+                    type: mongoose.Types.ObjectId,
+                    required: true
+                },
+                count: {
+                    type: Number,
+                    default: 0,
+                    required: true
+                }
+            }
+        ]
+    },
     currentGame: {
         type: String,
         required: false

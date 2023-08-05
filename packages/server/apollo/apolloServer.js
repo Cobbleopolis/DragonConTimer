@@ -2,7 +2,8 @@ import { ApolloServer } from '@apollo/server'
 import schema from './schema.js'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
-import { PubSub } from 'graphql-subscriptions'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import Redis from 'ioredis';
 
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
@@ -16,8 +17,21 @@ export default function(app, path) {
         // a different path.
         path,
     })
-    
-    const pubsub = new PubSub()
+
+
+    let redisConnectionString = process.env.REDIS_CONNECTION_STRING
+    if(process.env.REDIS_CONNECTION_STRING_FILE) {
+        try {
+            redisConnectionString = fs.readFileSync(process.env.REDIS_CONNECTION_STRING_FILE, 'utf-8').trim()
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    const pubsub = new RedisPubSub({
+        publisher: new Redis(redisConnectionString),
+        subscriber: new Redis(redisConnectionString)
+    })
     const apolloSchema = schema(pubsub)
     const serverCleanup = useServer({ schema: apolloSchema }, wsServer)
 

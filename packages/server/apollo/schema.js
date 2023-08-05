@@ -63,9 +63,6 @@ export default function(pubsub) {
         mutationObj[prefix + 'RemoveById'] = typeComposer.mongooseResolvers.removeById()
         mutationObj[prefix + 'RemoveOne'] = typeComposer.mongooseResolvers.removeOne()
         mutationObj[prefix + 'RemoveMany'] = typeComposer.mongooseResolvers.removeMany()
-        
-        
-        let changedKey = prefix + 'Changed'
     
         // Generate subscription hooks
         Object.keys(mutationObj).forEach((k) => {
@@ -74,7 +71,6 @@ export default function(pubsub) {
                 // extend resolve params with hook
                 const mutationOperation = prefix + determineMutationOperation(k)
                 rp.beforeRecordMutate = async function (doc) {
-                    pubsub.publish(changedKey, { [changedKey]: doc })
                     pubsub.publish(mutationOperation, { [mutationOperation]: doc })
                     return doc
                 }
@@ -90,8 +86,7 @@ export default function(pubsub) {
         const keys = [
             prefix + 'Create',
             prefix + 'Update',
-            prefix + 'Remove',
-            prefix + 'Changed'
+            prefix + 'Remove'
         ]
         let subscriptionObj = {}
         keys.forEach(k => {
