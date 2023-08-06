@@ -11,57 +11,71 @@
                         <i class="bi bi-exclamation-triangle"></i> {{ currentSelectedConsole.checkoutWarning }}
                     </div>
                     <form>
-                        <div class="mb-3">
-                            <label :id="'playerNameLabel' + station._id" class="form-label" :for="'playerNameInput' + station._id">Player Name</label>
-                            <input type="text" class="form-control" :id="'playerNameInput' + station._id" name="playerName" :aria-describedby="'playerNameHelp' + station._id" placeholder="John Doe" v-model="currentPlayerName"/>
-                            <div :id="'playerNameHelp' + station._id" class="form-text">The name of the person checking out the station</div>
-                        </div>
-                        <p>Console Options: {{ consoleOptions.length }}</p>
-                        <div class="mb-3">
-                            <label :id="'consoleOptionLabel' + station._id" class="form-label" :for="'consoleOptionInput' + station._id">Console</label>
-                            <select class="form-select" :id="'consoleOptionInput' + station._id" :aria-labelledby="'consoleOptionLabel' + station._id" :aria-describedby="'consoleOptionHelp' + station._id" v-model="currentConsole" @change="updateCurrentConsoleObj()">
-                                <option disabled hidden :value="''" :selected="currentConsole == ''">Select Console</option>
-                                <option v-for="console in consoleOptions" :value="console._id" :key="console._id" :selected="currentConsole == console._id">{{ console.name }}</option>
-                            </select>
-                            <div :id="'consoleOptionHelp' + station._id" class="form-text">The console they're going to play</div>
-                        </div>
-                        <div class="mb-3">
-                            <label :id="'gameOptionLabel' + station._id" class="form-label" :for="'gameOptionInput' + station._id">Game</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" :id="'gameOptionInput' + station._id" :list="'gameOptionsDatalist' + station._id" :aria-labelledby="'gameOptionLabel' + station._id" :aria-describedby="'gameOptionHelp' + station._id" autocomplete="off" placeholder="Game" v-model="currentGame">
-                                <button class="btn btn-outline-danger" type="button" @click="currentGame = ''"><i class="bi bi-x"></i></button>
+                        <fieldset>
+                            <legend>Basic Info</legend>
+                            <div class="mb-3">
+                                <label :id="'playerNameLabel' + station._id" class="form-label" :for="'playerNameInput' + station._id">Player Name</label>
+                                <input type="text" class="form-control" :id="'playerNameInput' + station._id" name="playerName" :aria-describedby="'playerNameHelp' + station._id" placeholder="John Doe" v-model="currentPlayerName"/>
+                                <div :id="'playerNameHelp' + station._id" class="form-text">The name of the person checking out the station</div>
                             </div>
-                            <datalist :id="'gameOptionsDatalist' + station._id">
-                                <option v-for="game in currentSelectedConsole?.games ?? []" :key="game.name">{{ game.name }}</option>
-                            </datalist>
-                            <div id="gameOptionHelp" class="form-text">
-                                The game they're going to play. Click/double click on the empty text box to see all options.<br>
-                                <i class="bi bi-exclamation-triangle"></i> PLEASE make sure to try and use autocomplete options as much as possible. Otherwise availibility might not work correctly.
+                            <p>Console Options: {{ consoleOptions.length }}</p>
+                            <div class="mb-3">
+                                <label :id="'consoleOptionLabel' + station._id" class="form-label" :for="'consoleOptionInput' + station._id">Console</label>
+                                <select class="form-select" :id="'consoleOptionInput' + station._id" :aria-labelledby="'consoleOptionLabel' + station._id" :aria-describedby="'consoleOptionHelp' + station._id" v-model="currentConsole" @change="updateCurrentConsoleObj()">
+                                    <option disabled hidden :value="''" :selected="currentConsole == ''">Select Console</option>
+                                    <option v-for="console in consoleOptions" :value="console._id" :key="console._id" :selected="currentConsole == console._id">{{ console.name }}</option>
+                                </select>
+                                <div :id="'consoleOptionHelp' + station._id" class="form-text">The console they're going to play</div>
                             </div>
-                        </div>
-                        <div class="mb-3">
+                            <div class="mb-3">
+                                <label :id="'gameOptionLabel' + station._id" class="form-label" :for="'gameOptionInput' + station._id">Game</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" :id="'gameOptionInput' + station._id" :list="'gameOptionsDatalist' + station._id" :aria-labelledby="'gameOptionLabel' + station._id" :aria-describedby="'gameOptionHelp' + station._id" autocomplete="off" placeholder="Game" v-model="currentGame">
+                                    <button class="btn btn-outline-danger" type="button" @click="currentGame = ''"><i class="bi bi-x"></i></button>
+                                </div>
+                                <datalist :id="'gameOptionsDatalist' + station._id">
+                                    <option v-for="game in currentSelectedConsole?.games ?? []" :key="game.name">{{ game.name }}</option>
+                                </datalist>
+                                <div id="gameOptionHelp" class="form-text">
+                                    The game they're going to play. Click/double click on the empty text box to see all options.<br>
+                                    <i class="bi bi-exclamation-triangle"></i> PLEASE make sure to try and use autocomplete options as much as possible. Otherwise availibility might not work correctly.
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="mb-3">
+                            <legend>Extras</legend>
+                            <div class="d-flex flex-column flex-md-row gap-2" v-if="currentSelectedConsole" >
+                                <div v-for="extra in currentExtras" :key="extra._id">
+                                    <label>{{ extra.name }}</label>
+                                    <input class="form-control" type="number" min="0" v-model="extra.count">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="mb-3">
+                            <legend>Checkout Time</legend>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" id="updateTimeInput" v-model="updateTime">
                                 <label class="form-check-label" id="updateTimeLabel" for="updateTimeInput">Update Checkout Time</label>
                             </div>
-                        </div>
-                        <div class="mb-3" v-if="updateTime">
-                            <div class="input-group">
-                                <div class="input-group-text">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="useCustomTimeInput" v-model="useCustomTime">
-                                        <label class="form-check-label" id="useCustomTimeLabel" for="useCustomTimeInput">Use Custom Time</label> 
-                                    </div>   
+                            <div v-if="updateTime">
+                                <div class="input-group">
+                                    <div class="input-group-text">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="useCustomTimeInput" v-model="useCustomTime">
+                                            <label class="form-check-label" id="useCustomTimeLabel" for="useCustomTimeInput">Use Custom Time</label> 
+                                        </div>   
+                                    </div>
+                                    <input type="datetime-local" class="form-control" aria-label="Custom Time" :disabled="!useCustomTime" v-model="customTime">
+                                    <button class="btn btn-outline-secondary" type="button" id="customTimeNowButton" @click="setCustomTime(moment())" :disabled="!useCustomTime">Now</button>
                                 </div>
-                                <input type="datetime-local" class="form-control" aria-label="Custom Time" :disabled="!useCustomTime" v-model="customTime">
-                                <button class="btn btn-outline-secondary" type="button" id="customTimeNowButton" @click="setCustomTime(moment())" :disabled="!useCustomTime">Now</button>
                             </div>
-                        </div>
-                        <div class="mt-2 mb-3">
+                        </fieldset>
+                        <fieldset class="mb-3">
+                            <legend>Other</legend>
                             <label id="stationNotesLabel" class="form-label" for="stationNotesInput">Station Notes</label>
                             <textarea rows="1" class="form-control" id="stationNotesInput" name="stationNotes" aria-describedby="stationNotesHelp" placeholder="Lorem ipsum..." v-model="currentStationNotes"></textarea>
                             <div id="stationNotesHelp" class="form-text">Some notes we need to know</div>
-                        </div>
+                        </fieldset>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -77,7 +91,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useMutation } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import * as bootstrap from 'bootstrap'
@@ -104,12 +118,18 @@ const currentSelectedConsole = ref(null)
 const currentGame = ref('')
 const currentStationNotes = ref('')
 
+const currentExtras = ref([])
+
 const isSubmitting = ref(false)
 const updateTime = ref(false)
 const useCustomTime = ref(false)
 const customTime = ref('')
 
 let updateState = null
+
+// watch(currentConsole, () => {
+//     updateCurrentConsoleObj()
+// })
 
 onMounted(() => {
     modalObj = new bootstrap.Modal(modalRoot.value)
@@ -123,6 +143,9 @@ function _show(options) {
     modalObj.show()
     updateTime.value = options.defaultTimeUpdateState ?? false
     useCustomTime.value = options.defaultUpdateCustomTimeState ?? false
+    if (options.resetExtrasCount) {
+        currentExtras.value.forEach(e => e.count = 0)
+    }
 
     updateState = options.stateToUpdateTo
 }
@@ -144,7 +167,39 @@ function populateFields() {
     if (props.consoleOptions.length === 1) {
         currentConsole.value = props.consoleOptions[0]._id
     }
+    currentExtras.value = props.station?.currentExtras ?? []
     updateCurrentConsoleObj()
+    // if (currentExtras.value.length > 0) {
+    //         currentExtras.value = props.station?.currentExtras.map(e => {
+    //             let name = 'Name Not Found'
+    //             console.log(e)
+    //             for (let se of currentSelectedConsole.value.extras) {
+    //                 if (se._id === e.extraId) {
+    //                     name = se.name
+    //                     break
+    //                 }
+    //             }
+    //             return {...e, name }
+    //         })
+    //     }
+    // }
+    // if (currentSelectedConsole.value) {
+    //     if (currentExtras.value.length === 0) {
+    //         currentExtras.value = currentSelectedConsole.value.extras.map(e => ({ extraId: e._id, name: e.name, count: 0}))
+    //     } else {
+    //         currentExtras.value = props.station?.currentExtras.map(e => {
+    //             let name = 'Name Not Found'
+    //             console.log(e)
+    //             for (let se of currentSelectedConsole.value.extras) {
+    //                 if (se._id === e.extraId) {
+    //                     name = se.name
+    //                     break
+    //                 }
+    //             }
+    //             return {...e, name }
+    //         }) ?? []
+    //     }
+    // }
     currentGame.value = props.station?.currentGame ?? ''
     currentStationNotes.value = props.station?.notes ?? ''
     setCustomTime(moment(props.station?.checkoutTime) ?? moment())
@@ -159,6 +214,16 @@ function updateCurrentConsoleObj() {
     for(const c of props.consoleOptions) {
         if (c._id == currentConsole.value) {
             currentSelectedConsole.value = c
+            const extras = c.extras.map(e => {
+                let count = 0
+                for (let ce of currentExtras.value) {
+                    if (e._id === ce.extraId) {
+                        count = ce.count
+                    }
+                }
+                return { extraId: e._id, name: e.name, count: count }
+            })
+            currentExtras.value = extras
             return
         }
     }
@@ -196,6 +261,7 @@ function submitForm() {
         playerName: currentPlayerName.value,
         currentConsole: currentConsole.value,
         currentGame: currentGame.value,
+        currentExtras: currentExtras.value.map(({__typename, name, ...gameObj}) => gameObj),
         notes: currentStationNotes.value
     }
 

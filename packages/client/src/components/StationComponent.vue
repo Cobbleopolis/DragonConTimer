@@ -86,6 +86,10 @@ query StationById($stationId: MongoID!) {
         consoleOptions
         currentConsole
         currentGame
+        currentExtras {
+            count
+            extraId
+        }
         name
         notes
         playerName
@@ -101,6 +105,11 @@ query ConsoleByIds($ids: [MongoID!]!, $sort: SortFindByIdsConsoleInput) {
         _id
         checkoutWarning
         games {
+            count
+            name
+        }
+        extras {
+            _id
             count
             name
         }
@@ -145,6 +154,10 @@ stationReq.subscribeToMore(() => ({
             checkoutTime
             consoleOptions
             currentConsole
+            currentExtras {
+                count
+                extraId
+            }
             currentGame
             name
             notes
@@ -165,6 +178,11 @@ consoleReq.subscribeToMore(() => ({
             _id
             checkoutWarning
             games {
+                count
+                name
+            }
+            extras {
+                _id
                 count
                 name
             }
@@ -206,6 +224,7 @@ function showCheckoutModal() {
     this.checkoutModal.show({
         popFields: true,
         defaultTimeUpdateState: true,
+        resetExtrasCount: true,
         defaultUpdateCustomTimeState: false,
         stateToUpdateTo: stationStates.CHECKED_OUT
     })
@@ -217,12 +236,13 @@ function showSetFieldsModal() {
     })
 }
 function checkinStation() {
-    this.isSubmitting = true
-    this.updateStation({
+    isSubmitting.value = true
+    updateStation({
         id: props.stationId,
         record: {
             playerName: '',
             currentConsole: null,
+            currentExtras: [],
             currentGame: '',
             checkoutTime: null,
             status: stationStates.DEFAULT

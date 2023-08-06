@@ -85,6 +85,13 @@ const cache = new InMemoryCache({
                     merge: false
                 }
             }
+        },
+        Station: {
+            fields: {
+                currentExtras: {
+                    merge: false
+                }
+            }
         }
     }
 })

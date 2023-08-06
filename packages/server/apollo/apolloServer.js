@@ -2,8 +2,10 @@ import { ApolloServer } from '@apollo/server'
 import schema from './schema.js'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import Redis from 'ioredis';
+import { PubSub } from 'graphql-subscriptions'
+// import { RedisPubSub } from 'graphql-redis-subscriptions'
+// import Redis from 'ioredis';
+// import { MongodbPubSub } from 'graphql-mongoose-subscriptions'
 
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
@@ -28,10 +30,16 @@ export default function(app, path) {
         }
     }
 
-    const pubsub = new RedisPubSub({
-        publisher: new Redis(redisConnectionString),
-        subscriber: new Redis(redisConnectionString)
-    })
+    const maxListeners = process.env.MAX_LISTENERS | 0 ?? 1024
+
+    const pubsub = new PubSub()
+    // const pubsub = new RedisPubSub({
+    //     publisher: new Redis(redisConnectionString),
+    //     subscriber: new Redis(redisConnectionString)
+    // })
+    // const pubsub = new MongodbPubSub()
+    // console.log(pubsub.ee.getMaxListeners())
+    pubsub.ee.setMaxListeners(maxListeners)
     const apolloSchema = schema(pubsub)
     const serverCleanup = useServer({ schema: apolloSchema }, wsServer)
 
