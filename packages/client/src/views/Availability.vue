@@ -23,8 +23,22 @@
                         <div class="collapse" :id="'consoleGameListCollapse-' + console._id">
                             <div class="accordion-body px-0 pt-0 pb-1">
                                 <ul class="list-group list-group-flush">
-                                    <li :class="'list-group-item ' + (availableGameCount[console._id + '-' + game.name] === 0 ? 'list-group-item-danger' : '')" v-for="game in console.games" :key="game.name">
+                                    <li :class="'list-group-item ' + (availableGameCount[console._id + '-' + game.name] <= 0 ? 'list-group-item-danger' : '')" v-for="game in console.games" :key="game.name">
                                         <span>{{ game.name }}: {{ availableGameCount[console._id + '-' + game.name] }}/{{ game.count }}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#consoleExtraListCollapse-' + console._id" aria-expanded="false" :aria-controls="'consoleExtraListCollapse-' + console._id">Extras</button>
+                        </h2>
+                        <div class="collapse" :id="'consoleExtraListCollapse-' + console._id">
+                            <div class="accordion-body px-0 pt-0 pb-1">
+                                <ul class="list-group list-group-flush">
+                                    <li :class="'list-group-item ' + (availableExtraCount[extra._id] <= 0 ? 'list-group-item-danger' : '')" v-for="extra in console.extras" :key="extra._id">
+                                        <span>{{ extra.name }}: {{ availableExtraCount[extra._id]}}/{{ extra.count }}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -63,6 +77,10 @@ query Station {
         name
         consoleOptions
         currentConsole
+        currentExtras {
+            extraId
+            count
+        }
         currentGame
         status
         checkoutTime
@@ -78,6 +96,10 @@ stationReq.subscribeToMore({
             checkoutTime
             consoleOptions
             currentConsole
+            currentExtras {
+                extraId
+                count
+            }
             currentGame
             status
         }
@@ -94,6 +116,10 @@ stationReq.subscribeToMore({
             checkoutTime
             consoleOptions
             currentConsole
+            currentExtras {
+                extraId
+                count
+            }
             currentGame
             status
         }
@@ -109,6 +135,10 @@ stationReq.subscribeToMore({
             name
             checkoutTime
             consoleOptions
+            currentExtras {
+                extraId
+                count
+            }
             currentConsole
             currentGame
             status
@@ -127,6 +157,11 @@ query Console {
             count
             name
         }
+        extras {
+            _id
+            count
+            name
+        }
         name
     }
 }`)
@@ -137,6 +172,11 @@ consoleReq.subscribeToMore({
         consoleCreate {
             _id
             games {
+                count
+                name
+            }
+            extras {
+                _id
                 count
                 name
             }
@@ -155,6 +195,11 @@ consoleReq.subscribeToMore({
                 count
                 name
             }
+            extras {
+                _id
+                count
+                name
+            }
             name
         }
     }`,
@@ -167,6 +212,11 @@ consoleReq.subscribeToMore({
         consoleRemove {
             _id
             games {
+                count
+                name
+            }
+            extras {
+                _id
                 count
                 name
             }
@@ -199,6 +249,16 @@ const availableGameCount = computed(() => {
     consoles.value.forEach(c => {
         c.games.forEach(g => {
             tmp[c._id + '-' + g.name] = g.count - stations.value.filter(s => s.currentConsole === c._id && s.currentGame === g.name).length
+        })
+    })
+    return tmp
+})
+
+const availableExtraCount = computed(() => {
+    const tmp = {}
+    consoles.value.forEach(c => {
+        c.extras.forEach(e => {
+            tmp[e._id] = e.count - stations.value.filter(s => s.currentConsole === c._id).map(s => s.currentExtras.find(se => se.extraId === e._id).count).reduce((a, b) => a + b, 0)
         })
     })
     return tmp
