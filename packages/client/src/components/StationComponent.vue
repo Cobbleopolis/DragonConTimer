@@ -5,14 +5,18 @@
             <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
         </div>
         <div class="card-body" v-if="station.status !== stationStates.NOT_AVAILABLE">
-            <p>Console Options:
-                <span v-if="!isLoading && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
-                <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
-            </p>
-            <p v-if="isCheckedOut()">Time since checkout:
-                <span v-if="timeSinceCheckout">{{ timeSinceCheckout }}</span>
-                <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
-            </p>
+            <div class="d-flex">
+                <div class="me-auto">
+                    <p>Console Options:
+                        <span v-if="!isLoading && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
+                        <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
+                    </p>
+                    <p v-if="isCheckedOut()">Time since checkout:
+                        <span v-if="timeSinceCheckout">{{ timeSinceCheckout }}</span>
+                        <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
+                    </p>
+                </div>
+            </div>
             <form>
                 <div class="row g-2">
                     <div class="col-12 col-md-4">
