@@ -18,7 +18,6 @@
                                 <input type="text" class="form-control" :id="'playerNameInput' + station._id" name="playerName" :aria-describedby="'playerNameHelp' + station._id" placeholder="John Doe" v-model="currentPlayerName"/>
                                 <div :id="'playerNameHelp' + station._id" class="form-text">The name of the person checking out the station</div>
                             </div>
-                            <p>Console Options: {{ consoleOptions.length }}</p>
                             <div class="mb-3">
                                 <label :id="'consoleOptionLabel' + station._id" class="form-label" :for="'consoleOptionInput' + station._id">Console</label>
                                 <select class="form-select" :id="'consoleOptionInput' + station._id" :aria-labelledby="'consoleOptionLabel' + station._id" :aria-describedby="'consoleOptionHelp' + station._id" v-model="currentConsole" @change="updateCurrentConsoleObj()">
@@ -44,7 +43,7 @@
                         </fieldset>
                         <fieldset class="mb-3">
                             <legend>Extras</legend>
-                            <div class="d-flex flex-column flex-md-row gap-2" v-if="currentSelectedConsole" >
+                            <div class="d-flex flex-wrap flex-column flex-md-row gap-2" v-if="currentSelectedConsole" >
                                 <div v-for="extra in currentExtras" :key="extra._id">
                                     <label>{{ extra.name }}</label>
                                     <input class="form-control" type="number" min="0" v-model="extra.count">
@@ -91,7 +90,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useMutation } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import * as bootstrap from 'bootstrap'
@@ -126,10 +125,6 @@ const useCustomTime = ref(false)
 const customTime = ref('')
 
 let updateState = null
-
-// watch(currentConsole, () => {
-//     updateCurrentConsoleObj()
-// })
 
 onMounted(() => {
     modalObj = new bootstrap.Modal(modalRoot.value)
@@ -169,37 +164,6 @@ function populateFields() {
     }
     currentExtras.value = props.station?.currentExtras ?? []
     updateCurrentConsoleObj()
-    // if (currentExtras.value.length > 0) {
-    //         currentExtras.value = props.station?.currentExtras.map(e => {
-    //             let name = 'Name Not Found'
-    //             console.log(e)
-    //             for (let se of currentSelectedConsole.value.extras) {
-    //                 if (se._id === e.extraId) {
-    //                     name = se.name
-    //                     break
-    //                 }
-    //             }
-    //             return {...e, name }
-    //         })
-    //     }
-    // }
-    // if (currentSelectedConsole.value) {
-    //     if (currentExtras.value.length === 0) {
-    //         currentExtras.value = currentSelectedConsole.value.extras.map(e => ({ extraId: e._id, name: e.name, count: 0}))
-    //     } else {
-    //         currentExtras.value = props.station?.currentExtras.map(e => {
-    //             let name = 'Name Not Found'
-    //             console.log(e)
-    //             for (let se of currentSelectedConsole.value.extras) {
-    //                 if (se._id === e.extraId) {
-    //                     name = se.name
-    //                     break
-    //                 }
-    //             }
-    //             return {...e, name }
-    //         }) ?? []
-    //     }
-    // }
     currentGame.value = props.station?.currentGame ?? ''
     currentStationNotes.value = props.station?.notes ?? ''
     setCustomTime(moment(props.station?.checkoutTime) ?? moment())
@@ -261,7 +225,8 @@ function submitForm() {
         playerName: currentPlayerName.value,
         currentConsole: currentConsole.value,
         currentGame: currentGame.value,
-        currentExtras: currentExtras.value.map(({__typename, name, ...gameObj}) => gameObj),
+        // eslint-disable-next-line no-unused-vars
+        currentExtras: currentExtras.value.map(({__typename, ...gameObj}) => gameObj),
         notes: currentStationNotes.value
     }
 
