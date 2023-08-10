@@ -1,7 +1,7 @@
 {
   "name": "@dct/client",
   "private": true,
-  "version": "3.0.0-alpha.3",
+  "version": "3.0.0-alpha.4",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build --mode production",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.4",
-    "@dct/common": "^3.0.0-alpha.3",
+    "@dct/common": "^3.0.0-alpha.4",
     "@popperjs/core": "^2.11.7",
     "@vue/apollo-composable": "^4.0.0-beta.4",
     "bootstrap": "^5.3.0-alpha2",

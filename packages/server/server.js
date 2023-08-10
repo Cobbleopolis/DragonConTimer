@@ -49,3 +49,23 @@ app.server.listen(PORT, () => {
     console.log(`🍆 Server is listening at http://localhost:${PORT}`)
     console.log(`🍆 Graphql is on http://localhost:${PORT}${GQL_PATH}`)
 })
+
+const SHUTDOWN_SIGNALS = {
+    'SIGHUP': 1,
+    'SIGINT': 2,
+    'SIGTERM': 15
+}
+
+function shutdown(signal, value) {
+    app.server.close(() => {
+        console.log(`Server stopped by ${signal} with value ${value}`)
+        process.exit(128 + value)
+    })
+}
+
+Object.keys(SHUTDOWN_SIGNALS).forEach(signal => {
+    process.on(signal, () => {
+        console.log(`Process recieved a ${signal} signal`)
+        shutdown(signal, SHUTDOWN_SIGNALS[signal])
+    })
+})
