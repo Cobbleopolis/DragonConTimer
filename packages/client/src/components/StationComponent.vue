@@ -5,14 +5,22 @@
             <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
         </div>
         <div class="card-body" v-if="station.status !== stationStates.NOT_AVAILABLE">
-            <p>Console Options:
-                <span v-if="!isLoading && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
-                <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
-            </p>
-            <p v-if="isCheckedOut()">Time since checkout:
-                <span v-if="timeSinceCheckout">{{ timeSinceCheckout }}</span>
-                <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
-            </p>
+            <div class="d-flex flex-column flex-md-row mb-2">
+                <div class="d-flex flex-column me-auto">
+                    <span>Console Options:
+                        <span v-if="!isLoading && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
+                        <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
+                    </span>
+                    <span v-if="isCheckedOut()">Time since checkout:
+                        <span v-if="timeSinceCheckout">{{ timeSinceCheckout }}</span>
+                        <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
+                    </span>
+                </div>
+                <div v-if="isCheckedOut()" class="d-flex flex-column">
+                    <span>Current Extras:</span>
+                    <span v-for="extra in currentDisplayExtras" :key="extra.extraId">{{ extra.name }}&nbsp;x{{ extra.count }}</span>
+                </div>
+            </div>
             <form>
                 <div class="row g-2">
                     <div class="col-12 col-md-4">
@@ -86,6 +94,10 @@ query StationById($stationId: MongoID!) {
         consoleOptions
         currentConsole
         currentGame
+        currentExtras {
+            count
+            extraId
+        }
         name
         notes
         playerName
@@ -104,6 +116,11 @@ query ConsoleByIds($ids: [MongoID!]!, $sort: SortFindByIdsConsoleInput) {
             count
             name
         }
+        extras {
+            _id
+            count
+            name
+        }
         name
     }
 }`, () => ({
@@ -116,6 +133,15 @@ query ConsoleByIds($ids: [MongoID!]!, $sort: SortFindByIdsConsoleInput) {
 const station = computed(() => stationReq.result.value?.stationById ?? {})
 const timeSinceCheckout = ref('')
 const consoleOptions = computed(() => consoleReq.result.value?.consoleByIds ?? [])
+const currentDisplayExtras = computed(() => {
+    if (!consoleOptions.value || !station.value || !station.value.currentConsole) {
+        return []
+    }
+    const curConsole = consoleOptions.value.find(c => c._id == station.value.currentConsole)
+    if (!curConsole)
+        return []
+    return station.value.currentExtras.filter(e => e.count > 0).map(e => ({...e, name: curConsole.extras.find(ce => ce._id === e.extraId).name}))
+})
 
 const currentConsole = computed(() => {
     if (consoleOptions.value && consoleOptions.value.length > 0)
@@ -145,6 +171,10 @@ stationReq.subscribeToMore(() => ({
             checkoutTime
             consoleOptions
             currentConsole
+            currentExtras {
+                count
+                extraId
+            }
             currentGame
             name
             notes
@@ -165,6 +195,11 @@ consoleReq.subscribeToMore(() => ({
             _id
             checkoutWarning
             games {
+                count
+                name
+            }
+            extras {
+                _id
                 count
                 name
             }
@@ -206,6 +241,7 @@ function showCheckoutModal() {
     this.checkoutModal.show({
         popFields: true,
         defaultTimeUpdateState: true,
+        resetExtrasCount: true,
         defaultUpdateCustomTimeState: false,
         stateToUpdateTo: stationStates.CHECKED_OUT
     })
@@ -217,12 +253,13 @@ function showSetFieldsModal() {
     })
 }
 function checkinStation() {
-    this.isSubmitting = true
-    this.updateStation({
+    isSubmitting.value = true
+    updateStation({
         id: props.stationId,
         record: {
             playerName: '',
             currentConsole: null,
+            currentExtras: [],
             currentGame: '',
             checkoutTime: null,
             status: stationStates.DEFAULT
@@ -287,6 +324,7 @@ function updateBorderVarient() {
         borderVarient.value = 'default'
     }
 }
+
 function isCheckedOut() {
     return station.value.status === stationStates.CHECKED_OUT
 }

@@ -1,9 +1,7 @@
 <template>
     <div class="container pt-2">
-        <div v-if="!loading">
-            <div class="d-flex flex-column gap-2 mb-2">
-                <ConsoleConfigCard v-for="console in consoles" :key="console._id" :console-id="console._id"/>
-            </div>
+        <div v-if="!loading" class="d-flex flex-column gap-2">
+            <ConsoleConfigCard v-for="console in consoles" :key="console._id" :console-id="console._id"/>
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="New Console Name" aria-label="New Console Name" aria-describedby="button-add" v-model="newConsoleName">
                 <button class="btn btn-primary" type="button" id="button-add" @click="createNewConsole"><i class="bi bi-plus"></i> Add</button>

@@ -10,18 +10,28 @@
                     <input type="text" class="form-control" :id="'consoleName' + consoleObj._id" v-model="formName">
                 </div>
                 <div class="d-flex flex-column flex-md-row gap-2">
-                    <div class="flex-shrink-1">
+                    <div class="flex-grow-1">
                         <label :for="'gameName' + consoleObj._id" class="form-label"><span>Games</span></label>
                         <div class="input-group mb-1" v-for="(game, i) in formGames" :key="consoleObj._id + i">
                             <input type="text" class="form-control" :id="'gameName' + consoleObj._id + i" v-model="game.name" placeholder="Game Name">
                             <input type="number" class="form-control" :id="'gameCount' + consoleObj._id + i" v-model="game.count" min="0">
-                            <button class="btn btn-danger" type="button" :id="'buttonDeleteGame' + i" @click="deleteGame(i)"><i class="bi bi-trash"></i> Delete</button>
+                            <button class="btn btn-danger" type="button" :id="'buttonDeleteGame' + i" @click="deleteGame(i)"><i class="bi bi-trash"></i></button>
                         </div>
                         <div class="mb-2">
                             <button class="btn btn-primary" role="button" @click="addGame"><i class="bi bi-plus"></i> Add Game</button>
                         </div>
                     </div>
-                    <!-- Eventually extras should go here -->
+                    <div class="flex-grow-1">
+                        <label :for="'extraName' + consoleObj._id" class="form-label"><span>Extras</span></label>
+                        <div class="input-group mb-1" v-for="(extra, i) in formExtras" :key="consoleObj._id + i">
+                            <input type="text" class="form-control" :id="'extraName' + consoleObj._id + i" v-model="extra.name" placeholder="Extra Name">
+                            <input type="number" class="form-control" :id="'extraCount' + consoleObj._id + i" v-model="extra.count" min="0">
+                            <button class="btn btn-danger" type="button" :id="'buttonDeleteExtra' + i" @click="deleteExtra(i)"><i class="bi bi-trash"></i></button>
+                        </div>
+                        <div class="mb-2">
+                            <button class="btn btn-primary" role="button" @click="addExtra()"><i class="bi bi-plus"></i> Add Game</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label :for="'checkoutWarning' + consoleObj._id" class="form-label">Checkout Warning</label>
@@ -73,6 +83,11 @@ query ConsoleById($id: MongoID!) {
             count
             name
         }
+        extras {
+            _id
+            count
+            name
+        }
         name
     }
 }`, {
@@ -89,6 +104,11 @@ consoleReq.subscribeToMore({
                 count
                 name
             }
+            extras {
+                _id
+                count
+                name
+            }
             name
         }
     }`,
@@ -102,14 +122,16 @@ consoleReq.onResult((result) => {
     formName.value = result.data.consoleById.name
     // eslint-disable-next-line no-unused-vars
     formGames.value = result.data.consoleById.games.map(({__typename, ...gameObj}) => gameObj)
+    // eslint-disable-next-line no-unused-vars
+    formExtras.value = result.data.consoleById.extras.map(({__typename, ...gameObj}) => gameObj)
     formCheckoutWarning.value = result.data.consoleById.checkoutWarning
 })
 
 const consoleObj = computed(() => consoleReq.result.value?.consoleById ?? {})
 
 const formName = ref(consoleObj.value.name)
-// eslint-disable-next-line no-unused-vars
 const formGames = ref(consoleObj.value.games)
+const formExtras = ref(consoleObj.value.extras)
 const formCheckoutWarning = ref(consoleObj.value.checkoutWarning)
 
 const { mutate: updateConsole, onDone: onUpdateDone, onError: onUpdateError } = useMutation(gql`
@@ -156,6 +178,12 @@ function saveClick() {
                 var textB = b.name.toUpperCase()
                 return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
             }),
+            // eslint-disable-next-line no-unused-vars
+            extras: formExtras.value.map(({__typename, ...gameObj}) => gameObj).sort((a, b) => {
+                var textA = a.name.toUpperCase()
+                var textB = b.name.toUpperCase()
+                return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+            }),
             checkoutWarning: formCheckoutWarning.value
         }
     })
@@ -182,5 +210,13 @@ function addGame() {
 
 function deleteGame(index) {
     formGames.value.splice(index, 1)
+}
+
+function addExtra() {
+    formExtras.value = [...formExtras.value, {name: '', count: 1}]
+}
+
+function deleteExtra(index) {
+    formExtras.value.splice(index, 1)
 }
 </script>
