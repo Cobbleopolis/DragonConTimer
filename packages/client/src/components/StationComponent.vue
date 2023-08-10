@@ -16,6 +16,10 @@
                         <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
                     </p>
                 </div>
+                <div v-if="isCheckedOut()" class="d-flex flex-column">
+                    <span>Current Extras:</span>
+                    <span v-for="extra in currentDisplayExtras" :key="extra.extraId">{{ extra.name }}&nbsp;x{{ extra.count }}</span>
+                </div>
             </div>
             <form>
                 <div class="row g-2">
@@ -129,6 +133,15 @@ query ConsoleByIds($ids: [MongoID!]!, $sort: SortFindByIdsConsoleInput) {
 const station = computed(() => stationReq.result.value?.stationById ?? {})
 const timeSinceCheckout = ref('')
 const consoleOptions = computed(() => consoleReq.result.value?.consoleByIds ?? [])
+const currentDisplayExtras = computed(() => {
+    if (!consoleOptions.value || !station.value || !station.value.currentConsole) {
+        return []
+    }
+    const curConsole = consoleOptions.value.find(c => c._id == station.value.currentConsole)
+    if (!curConsole)
+        return []
+    return station.value.currentExtras.filter(e => e.count > 0).map(e => ({...e, name: curConsole.extras.find(ce => ce._id === e.extraId).name}))
+})
 
 const currentConsole = computed(() => {
     if (consoleOptions.value && consoleOptions.value.length > 0)
@@ -311,6 +324,7 @@ function updateBorderVarient() {
         borderVarient.value = 'default'
     }
 }
+
 function isCheckedOut() {
     return station.value.status === stationStates.CHECKED_OUT
 }
