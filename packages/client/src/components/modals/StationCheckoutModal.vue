@@ -226,7 +226,7 @@ function submitForm() {
         currentConsole: currentConsole.value,
         currentGame: currentGame.value,
         // eslint-disable-next-line no-unused-vars
-        currentExtras: currentExtras.value.map(({__typename, ...gameObj}) => gameObj),
+        currentExtras: currentExtras.value.map(({__typename, name, ...gameObj}) => gameObj),
         notes: currentStationNotes.value
     }
 
