@@ -1,8 +1,8 @@
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 import express from 'express'
 
@@ -14,11 +14,11 @@ const app = express()
 //     res.send('Hello World!')
 // })
 
-app.use('/', express.static(__dirname + '/public'))
-app.use('/availability', express.static(__dirname + '/public'))
-app.use('/config/globalSettings', express.static(__dirname + '/public'))
-app.use('/config/consoles', express.static(__dirname + '/public'))
-app.use('/config/stations', express.static(__dirname + '/public'))
+app.use('/', express.static(path.join(__dirname, '/public')))
+app.use('/availability', express.static(path.join(__dirname, '/public')))
+app.use('/config/globalSettings', express.static(path.join(__dirname, '/public')))
+app.use('/config/consoles', express.static(path.join(__dirname, '/public')))
+app.use('/config/stations', express.static(path.join(__dirname, '/public')))
 
 app.get('/alive', (req, res) => {
     res.status(200).json({status:"ok"});
