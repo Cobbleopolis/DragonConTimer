@@ -14,11 +14,11 @@ const app = express()
 //     res.send('Hello World!')
 // })
 
-app.use('/', express.static(path.join(__dirname, '/public')))
-app.use('/availability', express.static(path.join(__dirname, '/public')))
-app.use('/config/globalSettings', express.static(path.join(__dirname, '/public')))
-app.use('/config/consoles', express.static(path.join(__dirname, '/public')))
-app.use('/config/stations', express.static(path.join(__dirname, '/public')))
+app.use('/', express.static(path.join(__dirname, 'public')))
+app.use('/availability', express.static(path.join(__dirname, 'public')))
+app.use('/config/globalSettings', express.static(path.join(__dirname, 'public')))
+app.use('/config/consoles', express.static(path.join(__dirname, 'public')))
+app.use('/config/stations', express.static(path.join(__dirname, 'public')))
 
 app.get('/alive', (req, res) => {
     res.status(200).json({status:"ok"});
