@@ -27,8 +27,13 @@ import * as bootstrap from 'bootstrap'
 
 import Themes from './services/ThemesService'
 
-const httpUrl = import.meta.env.PROD ? window.location + import.meta.env.VITE_GQL_URL : 'http://' + import.meta.env.VITE_GQL_URL
-const wsUrl = import.meta.env.PROD ? 'ws://' + window.location.host + import.meta.env.VITE_GQL_URL : 'ws://' + import.meta.env.VITE_GQL_URL
+let baseUrl = window.location.host
+if (!baseUrl.endsWith('/')) {
+    baseUrl += '/'
+}
+
+const httpUrl = import.meta.env.PROD ? window.location.protocol + '//' + baseUrl + import.meta.env.VITE_GQL_URL : 'http://' + import.meta.env.VITE_GQL_URL
+const wsUrl = import.meta.env.PROD ? 'ws://' + baseUrl + import.meta.env.VITE_GQL_URL : 'ws://' + import.meta.env.VITE_GQL_URL
 
 const httpLink = createHttpLink({
     uri: httpUrl
