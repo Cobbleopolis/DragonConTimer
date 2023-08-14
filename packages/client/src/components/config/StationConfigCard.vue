@@ -27,7 +27,7 @@
             </div>
         </template>
         <template v-else>
-            <div class="card-head">
+            <div class="card-header">
                 <span class="placeholder-glow">ID: <span class="placeholder col-2"></span></span>
             </div>
             <div class="card-body d-flex justify-content-center">
