@@ -30,7 +30,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="accordion-item">
+                    <div class="accordion-item" v-if="console.extras && console.extras.length > 0">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#consoleExtraListCollapse-' + console._id" aria-expanded="false" :aria-controls="'consoleExtraListCollapse-' + console._id">Extras</button>
                         </h2>
@@ -258,7 +258,13 @@ const availableExtraCount = computed(() => {
     const tmp = {}
     consoles.value.forEach(c => {
         c.extras.forEach(e => {
-            tmp[e._id] = e.count - stations.value.filter(s => s.currentConsole === c._id).map(s => s.currentExtras.find(se => se.extraId === e._id).count).reduce((a, b) => a + b, 0)
+            tmp[e._id] = e.count - stations.value
+                .filter(s => s.currentConsole === c._id)
+                .map(s => {
+                    let stationExtra = s.currentExtras.find(se => se.extraId === e._id)
+                    return stationExtra ? stationExtra.count : 0
+                })
+                .reduce((a, b) => a + b, 0)
         })
     })
     return tmp

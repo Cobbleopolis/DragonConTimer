@@ -88,6 +88,9 @@ const cache = new InMemoryCache({
             fields: {
                 games: {
                     merge: false
+                },
+                extras: {
+                    merge: false
                 }
             }
         },

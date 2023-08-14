@@ -29,7 +29,7 @@
                             <button class="btn btn-danger" type="button" :id="'buttonDeleteExtra' + i" @click="deleteExtra(i)"><i class="bi bi-trash"></i></button>
                         </div>
                         <div class="mb-2">
-                            <button class="btn btn-primary" role="button" @click="addExtra()"><i class="bi bi-plus"></i> Add Game</button>
+                            <button class="btn btn-primary" role="button" @click="addExtra()"><i class="bi bi-plus"></i> Add Extra</button>
                         </div>
                     </div>
                 </div>

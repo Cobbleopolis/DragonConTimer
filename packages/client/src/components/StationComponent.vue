@@ -6,7 +6,7 @@
         </div>
         <div class="card-body" v-if="station.status !== stationStates.NOT_AVAILABLE">
             <div class="d-flex flex-column flex-md-row mb-2">
-                <div class="d-flex flex-column me-auto">
+                <div class="d-flex flex-column flex-grow-1 me-auto">
                     <span>Console Options:
                         <span v-if="!isLoading && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
                         <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
@@ -16,7 +16,7 @@
                         <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
                     </span>
                 </div>
-                <div v-if="isCheckedOut()" class="d-flex flex-column">
+                <div v-if="isCheckedOut() && currentDisplayExtras.length > 0" class="d-flex flex-column">
                     <span>Current Extras:</span>
                     <span v-for="extra in currentDisplayExtras" :key="extra.extraId">{{ extra.name }}&nbsp;x{{ extra.count }}</span>
                 </div>
@@ -44,15 +44,15 @@
         <ul class="list-group list-group-flush" v-if="station.notes">
             <li class="list-group-item text-primary-emphasis bg-primary-subtle">Notes: {{ station.notes }}</li>
         </ul>
-        <div class="card-footer text-body-secondary d-flex flex-wrap align-items-center">
-            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                <div class="btn-group me-2" role="group" aria-label="First group">
+        <div class="card-footer text-body-secondary">
+            <div class="btn-toolbar d-flex flex-wrap gap-2" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="btn-group" role="group" aria-label="First group">
                     <button class="btn btn-primary" @click="showCheckoutModal()"><i class="bi bi-box-arrow-up"></i>
                         Checkout</button>
                     <button class="btn btn-danger" @click="checkinStation()"><i class="bi bi-box-arrow-in-down"></i>
                         Checkin/Return</button>
                 </div>
-                <div class="btn-group me-2" role="group" aria-label="Second group">
+                <div class="btn-group" role="group" aria-label="Second group">
                     <button class="btn btn-info" @click="showSetFieldsModal()"><i class="bi bi-pencil"></i> Set
                         Fields</button>
                     <button class="btn btn-info" @click="toggleAvailability()"><i class="bi bi-toggle-off"></i> Toggle
@@ -140,7 +140,15 @@ const currentDisplayExtras = computed(() => {
     const curConsole = consoleOptions.value.find(c => c._id == station.value.currentConsole)
     if (!curConsole)
         return []
-    return station.value.currentExtras.filter(e => e.count > 0).map(e => ({...e, name: curConsole.extras.find(ce => ce._id === e.extraId).name}))
+    return station.value.currentExtras
+        .filter(e => e.count > 0)
+        .map(e => {
+            let consoleExtra = curConsole.extras.find(ce => ce._id === e.extraId)
+            return {
+                ...e, 
+                name: consoleExtra ? consoleExtra.name : 'Unknown Extra'
+            }
+        })
 })
 
 const currentConsole = computed(() => {
@@ -238,7 +246,7 @@ const kickTime = getSetting('kickTime')
 const borderVarient = ref('default')
 
 function showCheckoutModal() {
-    this.checkoutModal.show({
+    checkoutModal.value.show({
         popFields: true,
         defaultTimeUpdateState: true,
         resetExtrasCount: true,
@@ -247,7 +255,7 @@ function showCheckoutModal() {
     })
 }
 function showSetFieldsModal() {
-    this.checkoutModal.show({
+    checkoutModal.value.show({
         popFields: true,
         title: 'Set Fields'
     })
