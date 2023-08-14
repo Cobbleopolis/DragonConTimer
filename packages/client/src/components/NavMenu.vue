@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar navbar-expand-lg bg-body-secondary">
         <div class="container-fluid">
-            <a class="navbar-brand">Dragon Con Timer</a>
+            <a class="navbar-brand">Dragon Con Timer<span v-if="hasAppName">: {{ appName.value }}</span></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -48,9 +48,16 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 // eslint-disable-next-line no-unused-vars
 import { RouterLink } from 'vue-router'
 // eslint-disable-next-line no-unused-vars
 import ThemeSwitcher from './ThemeSwitcher.vue'
 import common from '@dct/common'
+
+import UseGlobalSettings from '../useables/UseGlobalSettings'
+
+const { getSetting } = UseGlobalSettings()
+const appName = getSetting('appName')
+const hasAppName = computed(() => appName && Object.keys(appName).length > 0)
 </script>

@@ -22,20 +22,22 @@ export default function () {
         const settingObj = computed(() => req.result.value?.globalSettingOneLean ?? {})
 
         req.onResult(res => {
-            req.subscribeToMore({
-                document: gql`
-                subscription GlobalSettingUpdateById($recordId: MongoID!) {
-                    globalSettingUpdateById(recordId: $recordId) {
-                        _id
-                        name
-                        value
-                    }
-                }`,
-                variables: {
-                    recordId: res.data.globalSettingOneLean._id
-                },
-                updateQuery: UseUpdateQuery.standardUpdateUpdateQuery('globalSettingOneLean', 'globalSettingUpdateById')
-            })
+            if (res.data.globalSettingOneLean) {
+                req.subscribeToMore({
+                    document: gql`
+                    subscription GlobalSettingUpdateById($recordId: MongoID!) {
+                        globalSettingUpdateById(recordId: $recordId) {
+                            _id
+                            name
+                            value
+                        }
+                    }`,
+                    variables: {
+                        recordId: res.data.globalSettingOneLean._id
+                    },
+                    updateQuery: UseUpdateQuery.standardUpdateUpdateQuery('globalSettingOneLean', 'globalSettingUpdateById')
+                })
+            }
         })
 
         return settingObj
