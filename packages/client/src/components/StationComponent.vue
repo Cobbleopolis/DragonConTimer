@@ -44,15 +44,15 @@
         <ul class="list-group list-group-flush" v-if="station.notes">
             <li class="list-group-item text-primary-emphasis bg-primary-subtle">Notes: {{ station.notes }}</li>
         </ul>
-        <div class="card-footer text-body-secondary d-flex flex-wrap align-items-center">
-            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                <div class="btn-group me-2" role="group" aria-label="First group">
+        <div class="card-footer text-body-secondary">
+            <div class="btn-toolbar d-flex flex-wrap gap-2" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="btn-group" role="group" aria-label="First group">
                     <button class="btn btn-primary" @click="showCheckoutModal()"><i class="bi bi-box-arrow-up"></i>
                         Checkout</button>
                     <button class="btn btn-danger" @click="checkinStation()"><i class="bi bi-box-arrow-in-down"></i>
                         Checkin/Return</button>
                 </div>
-                <div class="btn-group me-2" role="group" aria-label="Second group">
+                <div class="btn-group" role="group" aria-label="Second group">
                     <button class="btn btn-info" @click="showSetFieldsModal()"><i class="bi bi-pencil"></i> Set
                         Fields</button>
                     <button class="btn btn-info" @click="toggleAvailability()"><i class="bi bi-toggle-off"></i> Toggle
