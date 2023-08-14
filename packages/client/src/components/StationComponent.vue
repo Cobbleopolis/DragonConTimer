@@ -140,7 +140,15 @@ const currentDisplayExtras = computed(() => {
     const curConsole = consoleOptions.value.find(c => c._id == station.value.currentConsole)
     if (!curConsole)
         return []
-    return station.value.currentExtras.filter(e => e.count > 0).map(e => ({...e, name: curConsole.extras.find(ce => ce._id === e.extraId).name}))
+    return station.value.currentExtras
+        .filter(e => e.count > 0)
+        .map(e => {
+            let consoleExtra = curConsole.extras.find(ce => ce._id === e.extraId)
+            return {
+                ...e, 
+                name: consoleExtra ? consoleExtra.name : 'Unknown Extra'
+            }
+        })
 })
 
 const currentConsole = computed(() => {
