@@ -238,7 +238,7 @@ const kickTime = getSetting('kickTime')
 const borderVarient = ref('default')
 
 function showCheckoutModal() {
-    this.checkoutModal.show({
+    checkoutModal.value.show({
         popFields: true,
         defaultTimeUpdateState: true,
         resetExtrasCount: true,
@@ -247,7 +247,7 @@ function showCheckoutModal() {
     })
 }
 function showSetFieldsModal() {
-    this.checkoutModal.show({
+    checkoutModal.value.show({
         popFields: true,
         title: 'Set Fields'
     })
