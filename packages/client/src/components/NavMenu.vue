@@ -59,5 +59,5 @@ import UseGlobalSettings from '../useables/UseGlobalSettings'
 
 const { getSetting } = UseGlobalSettings()
 const appName = getSetting('appName')
-const hasAppName = computed(() => appName && Object.keys(appName).length > 0)
+const hasAppName = computed(() => appName.value && Object.keys(appName.value).length > 0)
 </script>
