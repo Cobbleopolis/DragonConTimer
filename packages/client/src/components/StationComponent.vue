@@ -6,7 +6,7 @@
         </div>
         <div class="card-body" v-if="station.status !== stationStates.NOT_AVAILABLE">
             <div class="d-flex flex-column flex-md-row mb-2">
-                <div class="d-flex flex-column me-auto">
+                <div class="d-flex flex-column flex-grow-1 me-auto">
                     <span>Console Options:
                         <span v-if="!isLoading && consoleReq.result">{{ consoleOptions.map(x => x.name).join(", ") }}</span>
                         <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
@@ -16,7 +16,7 @@
                         <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
                     </span>
                 </div>
-                <div v-if="isCheckedOut()" class="d-flex flex-column">
+                <div v-if="isCheckedOut() && currentDisplayExtras.length > 0" class="d-flex flex-column">
                     <span>Current Extras:</span>
                     <span v-for="extra in currentDisplayExtras" :key="extra.extraId">{{ extra.name }}&nbsp;x{{ extra.count }}</span>
                 </div>
