@@ -15,22 +15,22 @@
                             <legend>Basic Info</legend>
                             <div class="mb-3">
                                 <label :id="'playerNameLabel' + station._id" class="form-label" :for="'playerNameInput' + station._id">Player Name</label>
-                                <input type="text" class="form-control" :id="'playerNameInput' + station._id" name="playerName" :aria-describedby="'playerNameHelp' + station._id" placeholder="John Doe" v-model="currentPlayerName"/>
+                                <input type="text" class="form-control" :id="'playerNameInput' + station._id" name="playerName" :aria-describedby="'playerNameHelp' + station._id" placeholder="John Doe" v-model="formCurrentPlayerName"/>
                                 <div :id="'playerNameHelp' + station._id" class="form-text">The name of the person checking out the station</div>
                             </div>
                             <div class="mb-3">
                                 <label :id="'consoleOptionLabel' + station._id" class="form-label" :for="'consoleOptionInput' + station._id">Console</label>
-                                <select class="form-select" :id="'consoleOptionInput' + station._id" :aria-labelledby="'consoleOptionLabel' + station._id" :aria-describedby="'consoleOptionHelp' + station._id" v-model="currentConsole" @change="updateCurrentConsoleObj()">
-                                    <option disabled hidden :value="''" :selected="currentConsole == ''">Select Console</option>
-                                    <option v-for="console in consoleOptions" :value="console._id" :key="console._id" :selected="currentConsole == console._id">{{ console.name }}</option>
+                                <select class="form-select" :id="'consoleOptionInput' + station._id" :aria-labelledby="'consoleOptionLabel' + station._id" :aria-describedby="'consoleOptionHelp' + station._id" v-model="formCurrentConsole" @change="updateCurrentConsoleObj()">
+                                    <option disabled hidden :value="''" :selected="formCurrentConsole == ''">Select Console</option>
+                                    <option v-for="console in consoleOptions" :value="console._id" :key="console._id" :selected="formCurrentConsole == console._id">{{ console.name }}</option>
                                 </select>
                                 <div :id="'consoleOptionHelp' + station._id" class="form-text">The console they're going to play</div>
                             </div>
                             <div class="mb-3">
                                 <label :id="'gameOptionLabel' + station._id" class="form-label" :for="'gameOptionInput' + station._id">Game</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" :id="'gameOptionInput' + station._id" :list="'gameOptionsDatalist' + station._id" :aria-labelledby="'gameOptionLabel' + station._id" :aria-describedby="'gameOptionHelp' + station._id" autocomplete="off" placeholder="Game" v-model="currentGame">
-                                    <button class="btn btn-outline-danger" type="button" @click="currentGame = ''"><i class="bi bi-x"></i></button>
+                                    <input type="text" class="form-control" :id="'gameOptionInput' + station._id" :list="'gameOptionsDatalist' + station._id" :aria-labelledby="'gameOptionLabel' + station._id" :aria-describedby="'gameOptionHelp' + station._id" autocomplete="off" placeholder="Game" v-model="formCurrentGame">
+                                    <button class="btn btn-outline-danger" type="button" @click="formCurrentGame = ''"><i class="bi bi-x"></i></button>
                                 </div>
                                 <datalist :id="'gameOptionsDatalist' + station._id">
                                     <option v-for="game in currentSelectedConsole?.games ?? []" :key="game.name">{{ game.name }}</option>
@@ -41,10 +41,10 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset class="mb-3">
+                        <fieldset class="mb-3" v-if="currentSelectedConsole && currentSelectedConsole.extras.length > 0">
                             <legend>Extras</legend>
                             <div class="d-flex flex-wrap flex-column flex-md-row gap-2" v-if="currentSelectedConsole" >
-                                <div v-for="extra in currentExtras" :key="extra._id">
+                                <div v-for="extra in formCurrentExtras" :key="extra._id">
                                     <label>{{ extra.name }}</label>
                                     <input class="form-control" type="number" min="0" v-model="extra.count">
                                 </div>
@@ -61,7 +61,7 @@
                                     <div class="input-group-text">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="useCustomTimeInput" v-model="useCustomTime">
-                                            <label class="form-check-label" id="useCustomTimeLabel" for="useCustomTimeInput">Use Custom Time</label> 
+                                            <label class="form-check-label" id="useCustomTimeLabel" for="useCustomTimeInput">Custom Time</label> 
                                         </div>   
                                     </div>
                                     <input type="datetime-local" class="form-control" aria-label="Custom Time" :disabled="!useCustomTime" v-model="customTime">
@@ -72,7 +72,7 @@
                         <fieldset class="mb-3">
                             <legend>Other</legend>
                             <label id="stationNotesLabel" class="form-label" for="stationNotesInput">Station Notes</label>
-                            <textarea rows="1" class="form-control" id="stationNotesInput" name="stationNotes" aria-describedby="stationNotesHelp" placeholder="Lorem ipsum..." v-model="currentStationNotes"></textarea>
+                            <textarea rows="1" class="form-control" id="stationNotesInput" name="stationNotes" aria-describedby="stationNotesHelp" placeholder="Lorem ipsum..." v-model="formCurrentStationNotes"></textarea>
                             <div id="stationNotesHelp" class="form-text">Some notes we need to know</div>
                         </fieldset>
                     </form>
@@ -109,15 +109,15 @@ let modalObj = null
 
 const title = ref('Checkout Station')
 
-const currentPlayerName = ref('')
+const formCurrentPlayerName = ref('')
 
-const currentConsole = ref('')
+const formCurrentConsole = ref('')
 const currentSelectedConsole = ref(null)
 
-const currentGame = ref('')
-const currentStationNotes = ref('')
+const formCurrentGame = ref('')
+const formCurrentStationNotes = ref('')
 
-const currentExtras = ref([])
+const formCurrentExtras = ref([])
 
 const isSubmitting = ref(false)
 const updateTime = ref(false)
@@ -139,7 +139,10 @@ function _show(options) {
     updateTime.value = options.defaultTimeUpdateState ?? false
     useCustomTime.value = options.defaultUpdateCustomTimeState ?? false
     if (options.resetExtrasCount) {
-        currentExtras.value.forEach(e => e.count = 0)
+        formCurrentExtras.value.forEach(e => e.count = 0)
+    }
+    if (!formCurrentGame.value && currentSelectedConsole.value && currentSelectedConsole.value.games.length === 1) {
+        formCurrentGame.value = currentSelectedConsole.value.games[0].name
     }
 
     updateState = options.stateToUpdateTo
@@ -157,15 +160,15 @@ function _toggle(popFields) {
 }
 
 function populateFields() {
-    currentPlayerName.value = props.station?.playerName ?? ''
-    currentConsole.value = props.station?.currentConsole ?? ''
+    formCurrentPlayerName.value = props.station?.playerName ?? ''
+    formCurrentConsole.value = props.station?.currentConsole ?? ''
     if (props.consoleOptions.length === 1) {
-        currentConsole.value = props.consoleOptions[0]._id
+        formCurrentConsole.value = props.consoleOptions[0]._id
     }
-    currentExtras.value = props.station?.currentExtras ?? []
+    formCurrentExtras.value = props.station?.currentExtras ?? []
     updateCurrentConsoleObj()
-    currentGame.value = props.station?.currentGame ?? ''
-    currentStationNotes.value = props.station?.notes ?? ''
+    formCurrentGame.value = props.station?.currentGame ?? ''
+    formCurrentStationNotes.value = props.station?.notes ?? ''
     setCustomTime(moment(props.station?.checkoutTime) ?? moment())
 }
 
@@ -174,20 +177,23 @@ function setCustomTime(momentObj) {
 }
 
 function updateCurrentConsoleObj() {
-    currentGame.value = ''
+    formCurrentGame.value = ''
     for(const c of props.consoleOptions) {
-        if (c._id == currentConsole.value) {
+        if (c._id == formCurrentConsole.value) {
             currentSelectedConsole.value = c
             const extras = c.extras.map(e => {
                 let count = 0
-                for (let ce of currentExtras.value) {
+                for (let ce of formCurrentExtras.value) {
                     if (e._id === ce.extraId) {
                         count = ce.count
                     }
                 }
                 return { extraId: e._id, name: e.name, count: count }
             })
-            currentExtras.value = extras
+            formCurrentExtras.value = extras
+            if (!formCurrentGame.value && c.games.length === 1) {
+                formCurrentGame.value = c.games[0].name
+            }
             return
         }
     }
@@ -222,12 +228,12 @@ function submitForm() {
     isSubmitting.value = true
 
     let updateRecord = {
-        playerName: currentPlayerName.value,
-        currentConsole: currentConsole.value,
-        currentGame: currentGame.value,
+        playerName: formCurrentPlayerName.value,
+        currentConsole: formCurrentConsole.value,
+        currentGame: formCurrentGame.value,
         // eslint-disable-next-line no-unused-vars
-        currentExtras: currentExtras.value.map(({__typename, name, ...gameObj}) => gameObj),
-        notes: currentStationNotes.value
+        currentExtras: formCurrentExtras.value.map(({__typename, name, ...gameObj}) => gameObj),
+        notes: formCurrentStationNotes.value
     }
 
     if(updateTime.value) {
