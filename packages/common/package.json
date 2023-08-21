@@ -1,7 +1,7 @@
 {
   "name": "@dct/common",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Common code foor the DrgonCon LAN Gaming timer",
   "main": "index.js",
   "scripts": {

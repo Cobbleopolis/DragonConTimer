@@ -32,8 +32,13 @@ if (!baseUrl.endsWith('/')) {
     baseUrl += '/'
 }
 
+let webSocketProtocol = 'ws://'
+if(window.location.protocol === 'https:') {
+    webSocketProtocol = 'wss://'
+}
+
 const httpUrl = import.meta.env.PROD ? window.location.protocol + '//' + baseUrl + import.meta.env.VITE_GQL_URL : 'http://' + import.meta.env.VITE_GQL_URL
-const wsUrl = import.meta.env.PROD ? 'ws://' + baseUrl + import.meta.env.VITE_GQL_URL : 'ws://' + import.meta.env.VITE_GQL_URL
+const wsUrl = import.meta.env.PROD ? webSocketProtocol + baseUrl + import.meta.env.VITE_GQL_URL : webSocketProtocol + import.meta.env.VITE_GQL_URL
 
 const httpLink = createHttpLink({
     uri: httpUrl
