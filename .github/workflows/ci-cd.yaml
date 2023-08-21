@@ -38,13 +38,13 @@ jobs:
           images: |
             cobbleopolis/dragoncon-timer
           flavor: |
-            latest=${{!github.event.prerelease}}
+            latest=${{!github.event.release.prerelease}}
           tags: |
-            type=raw,value=latest-unstable,enable={{is_default_branch}}
-            type=raw,value=latest,enable=${{!github.event.prerelease}}
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=raw,value=latest-unstable,enable=${{github.event.release.prerelease}}
+            type=raw,value=latest,enable=${{!github.event.release.prerelease}}
+            type=semver,pattern={{version}},enable=true
+            type=semver,pattern={{major}}.{{minor}},enable=true
+            type=semver,pattern={{major}},enable=true
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
