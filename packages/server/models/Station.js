@@ -41,7 +41,7 @@ export default mongoose.model('Station', {
         type: String,
         required: false
     },
-    checkoutTime: {
+    totalCheckoutTime: {
         type: Date,
         requied: false
     },
