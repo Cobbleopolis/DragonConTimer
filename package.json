@@ -8,7 +8,8 @@
     "build": "lerna run build --stream",
     "version": "lerna version --no-git-tag-version --force-publish --no-push",
     "lint": "eslint **/* --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "telemetry": "lerna run telemetry --scope=@dct/server"
   },
   "type": "module",
   "author": "Cobbleopolis",

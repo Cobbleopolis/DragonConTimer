@@ -149,7 +149,7 @@ function populateFields() {
         formPlayerName.value = props.waitlistEntry.playerName
         formWaitingConsoles.value = props.waitlistEntry.waitingConsole ?? []
         formWaitingGames.value = props.waitlistEntry.waitingGame ?? []
-        setCustomTime(moment(props.station?.checkoutTime) ?? moment())
+        setCustomTime(moment(props.station?.totalCheckoutTime) ?? moment())
         formNotes.value = props.waitlistEntry.notes
     }
 }

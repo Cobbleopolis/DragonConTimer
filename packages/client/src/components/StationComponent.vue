@@ -280,7 +280,7 @@ function toggleAvailability() {
     if (station.value.status !== stationStates.NOT_AVAILABLE) {
         newState = stationStates.NOT_AVAILABLE
     } else {
-        if (station.value.checkoutTime) {
+        if (station.value.totalCheckoutTime) {
             newState = stationStates.CHECKED_OUT
         } else {
             newState = stationStates.DEFAULT
@@ -298,8 +298,8 @@ function updateTick() {
     updateBorderVarient()
 }
 function getFormattedTimeFromNow() {
-    if (!isLoading.value && station.value.checkoutTime !== null) {
-        timeSinceCheckout.value = timeUtils.formatDurationFormat(moment.duration(moment().diff(moment(station.value.checkoutTime))))
+    if (!isLoading.value && station.value.totalCheckoutTime !== null) {
+        timeSinceCheckout.value = timeUtils.formatDurationFormat(moment.duration(moment().diff(moment(station.value.totalCheckoutTime))))
     } else {
         timeSinceCheckout.value = ''
     }
@@ -309,7 +309,7 @@ function updateBorderVarient() {
         if (station.value.status === stationStates.NOT_AVAILABLE) {
             borderVarient.value = 'secondary'
         } else if (station.value.status === stationStates.CHECKED_OUT) {
-            const duration = moment.duration(moment().diff(moment(station.value.checkoutTime))).asMilliseconds()
+            const duration = moment.duration(moment().diff(moment(station.value.totalCheckoutTime))).asMilliseconds()
             const kickMillis = moment.duration(kickTime.value.value).asMilliseconds()
             const warnMillis = moment.duration(warnTime.value.value).asMilliseconds()
             if (duration >= kickMillis) {
@@ -319,7 +319,7 @@ function updateBorderVarient() {
                 borderVarient.value = 'danger'
             } else if (duration >= warnMillis) {
                 if (borderVarient.value != 'warning') {
-                    toast.warning(station.value.name + ' has ' + moment.duration(moment().diff(moment(station.value.checkoutTime).add(kickMillis, 'millisecond'))).humanize() + ' left')
+                    toast.warning(station.value.name + ' has ' + moment.duration(moment().diff(moment(station.value.totalCheckoutTime).add(kickMillis, 'millisecond'))).humanize() + ' left')
                 }
                 borderVarient.value = 'warning'
             } else {

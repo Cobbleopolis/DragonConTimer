@@ -108,7 +108,7 @@ function checkinStation() {
             currentConsole: null,
             currentExtras: [],
             currentGame: '',
-            checkoutTime: null,
+            totalCheckoutTime: null,
             status: stationStates.DEFAULT,
             checkoutNotes: ''
         }
