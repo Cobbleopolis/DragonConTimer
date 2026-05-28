@@ -8,7 +8,7 @@ import 'dotenv/config'
 
 import app from './app.js'
 import apolloServer from './apollo/apolloServer.js'
-import { expressMiddleware } from '@apollo/server/express4'
+import { expressMiddleware } from '@as-integrations/express5';
 
 const PORT = process.env.PORT ?? 9000
 const GQL_PATH = process.env.GQL_PATH ?? '/gql'

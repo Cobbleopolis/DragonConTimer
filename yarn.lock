@@ -399,6 +399,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@as-integrations/express5@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@as-integrations/express5@npm:1.1.2"
+  peerDependencies:
+    "@apollo/server": ^4.0.0 || ^5.0.0
+    express: ^5.0.0
+  checksum: 10c0/6bf6ee9afaf236442d468881f6bf37b3833c372fa4d1bab836d67cbd2def4f67182de5352bbda3ac4579992c604a0dd788c0cf1b75d2d01a66990ee3f566abc1
+  languageName: node
+  linkType: hard
+
 "@asamuzakjp/css-color@npm:^5.1.11":
   version: 5.1.11
   resolution: "@asamuzakjp/css-color@npm:5.1.11"
@@ -2096,7 +2106,7 @@ __metadata:
     nodemon: "npm:^3.1.14"
     pinia: "npm:^3.0.4"
     prettier: "npm:^3.8.3"
-    sass: "npm:^1.100.0"
+    sass: "npm:^1.32.13"
     vite: "npm:8.0.14"
     vitest: "npm:^4.1.7"
     vue: "npm:^3.5.35"
@@ -2117,6 +2127,7 @@ __metadata:
   resolution: "@dct/server@workspace:packages/server"
   dependencies:
     "@apollo/server": "npm:^5.5.1"
+    "@as-integrations/express5": "npm:^1.1.2"
     "@dct/common": "npm:^3.1.0"
     apollo-datasource-mongodb: "npm:^0.6.0"
     body-parser: "npm:^2.2.2"
@@ -13898,7 +13909,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.100.0":
+"sass@npm:^1.32.13":
   version: 1.100.0
   resolution: "sass@npm:1.100.0"
   dependencies:
