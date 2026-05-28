@@ -130,7 +130,7 @@ query ConsoleByIds($ids: [MongoID!]!, $sort: SortFindByIdsConsoleInput) {
         name
     }
 }`, () => ({
-    ids: stationReq.result.value?.stationById.consoleOptions,
+    ids: stationReq.result.value?.stationById.consoleOptions ?? [],
     sort: '_ID_ASC'
 }), () => ({
     enabled: consoleReqEnabled.value && !stationReq.isLoading
@@ -143,7 +143,7 @@ const currentDisplayExtras = computed(() => {
     if (!consoleOptions.value || !station.value || !station.value.currentConsole) {
         return []
     }
-    const curConsole = consoleOptions.value.find(c => c._id == station.value.currentConsole)
+    const curConsole = consoleOptions.value.find(c => c._id === station.value.currentConsole)
     if (!curConsole)
         return []
     return station.value.currentExtras
@@ -280,7 +280,7 @@ function toggleAvailability() {
     if (station.value.status !== stationStates.NOT_AVAILABLE) {
         newState = stationStates.NOT_AVAILABLE
     } else {
-        if (station.value.totalCheckoutTime) {
+        if (station.value.checkoutTime) {
             newState = stationStates.CHECKED_OUT
         } else {
             newState = stationStates.DEFAULT
@@ -298,8 +298,8 @@ function updateTick() {
     updateBorderVarient()
 }
 function getFormattedTimeFromNow() {
-    if (!isLoading.value && station.value.totalCheckoutTime !== null) {
-        timeSinceCheckout.value = timeUtils.formatDurationFormat(moment.duration(moment().diff(moment(station.value.totalCheckoutTime))))
+    if (!isLoading.value && station.value.checkoutTime !== null) {
+        timeSinceCheckout.value = timeUtils.formatDurationFormat(moment.duration(moment().diff(moment(station.value.checkoutTime))))
     } else {
         timeSinceCheckout.value = ''
     }
@@ -309,17 +309,17 @@ function updateBorderVarient() {
         if (station.value.status === stationStates.NOT_AVAILABLE) {
             borderVarient.value = 'secondary'
         } else if (station.value.status === stationStates.CHECKED_OUT) {
-            const duration = moment.duration(moment().diff(moment(station.value.totalCheckoutTime))).asMilliseconds()
+            const duration = moment.duration(moment().diff(moment(station.value.checkoutTime))).asMilliseconds()
             const kickMillis = moment.duration(kickTime.value.value).asMilliseconds()
             const warnMillis = moment.duration(warnTime.value.value).asMilliseconds()
             if (duration >= kickMillis) {
-                if (borderVarient.value != 'danger') {
+                if (borderVarient.value !== 'danger') {
                     toast.error(station.value.name + ' needs to be kicked')
                 }
                 borderVarient.value = 'danger'
             } else if (duration >= warnMillis) {
-                if (borderVarient.value != 'warning') {
-                    toast.warning(station.value.name + ' has ' + moment.duration(moment().diff(moment(station.value.totalCheckoutTime).add(kickMillis, 'millisecond'))).humanize() + ' left')
+                if (borderVarient.value !== 'warning') {
+                    toast.warning(station.value.name + ' has ' + moment.duration(moment().diff(moment(station.value.checkoutTime).add(kickMillis, 'millisecond'))).humanize() + ' left')
                 }
                 borderVarient.value = 'warning'
             } else {
