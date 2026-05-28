@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@apollo/client": "^3.4.13",
+    "@apollo/client": "^3.10.4",
     "@dct/common": "^3.2.0-alpha.0",
     "@popperjs/core": "^2.11.8",
     "@vue/apollo-composable": "^4.2.2",

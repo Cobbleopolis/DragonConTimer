@@ -25,11 +25,11 @@ if(process.env.DB_CONNECTION_STRING_FILE) {
 }
 
 mongoose.set('strictQuery', false)
-mongoose.connect(connectionString)
+let mongooseConnection = await mongoose.connect(connectionString)
 
 app.server = http.createServer(app)
 
-const apollo = apolloServer(app, GQL_PATH)
+const apollo = apolloServer(app, GQL_PATH, mongooseConnection)
 
 await apollo.start()
 
