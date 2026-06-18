@@ -21,21 +21,6 @@ export default function(app, path, mongoose) {
     const useDynamicListeners = (process.env.USE_DYNAMIC_LISTENERS ?? 'false').toLowerCase() === 'true'
 
     const pubsub = new MongodbPubSub({mongoose: mongoose})
-    // const pubsub = new RedisPubSub({
-    //     publisher: new Redis(redisConnectionString),
-    //     subscriber: new Redis(redisConnectionString)
-    // })
-    // const pubsub = new MongodbPubSub()
-    // console.log(pubsub.ee.getMaxListeners())
-    pubsub.ee.setMaxListeners(maxListeners)
-    if (useDynamicListeners) {
-        pubsub.ee.on('connection', () => { // This should let us constantly resize our pubsub listeners
-            console.log("New Connection! " + pubsub.ee.listenerCount)
-            if (pubsub.ee.listenerCount === pubsub.ee.getMaxListeners()) {
-                pubsub.ee.setMaxListeners(pubsub.ee.getMaxListeners() * 2)
-            }
-        })
-    }
     const apolloSchema = schema(pubsub)
     const serverCleanup = useServer({ schema: apolloSchema }, wsServer)
 
