@@ -1,8 +1,8 @@
-@import "bootstrap/scss/bootstrap"
-@import 'vue-toast-notification/dist/theme-bootstrap.css'
-@import 'bootstrap-icons/font/bootstrap-icons.css'
+@use "bootstrap/scss/bootstrap" as bootstrap
+@use 'vue-toast-notification/dist/theme-bootstrap.css' as toast-bootstrap
+@use 'bootstrap-icons/font/bootstrap-icons.css' as icons
 
-@include color-mode(dark)
+@include bootstrap.color-mode(dark)
   .element
     color: var(--bs-primary-text-emphasis)
     background-color: var(--bs-primary-bg-subtle)

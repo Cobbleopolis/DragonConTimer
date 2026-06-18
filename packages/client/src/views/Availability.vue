@@ -289,9 +289,9 @@ function updateTimeToNextConsole() {
         let timeToNextConsoleStr = null
         const checkedOutStationsWithConsole = stations.value.filter(s => s.consoleOptions.includes(c._id) && s.status === stationStates.CHECKED_OUT)
         if (checkedOutStationsWithConsole.length > 0) {
-            let oldestCheckoutTime = moment(checkedOutStationsWithConsole[0].totalCheckoutTime)
+            let oldestCheckoutTime = moment(checkedOutStationsWithConsole[0].checkoutTime)
             checkedOutStationsWithConsole.forEach(s => {
-                const momentCheckoutTime = moment(s.totalCheckoutTime)
+                const momentCheckoutTime = moment(s.checkoutTime)
                 if (momentCheckoutTime.isBefore(oldestCheckoutTime)) {
                     oldestCheckoutTime = momentCheckoutTime
                 }
@@ -309,7 +309,7 @@ function updateStationsToKick() {
             if (!s.consoleOptions.includes(c._id)) {
                 return false
             }
-            const availableTime = moment(s.totalCheckoutTime).add(moment.duration(kickTime.value.value))
+            const availableTime = moment(s.checkoutTime).add(moment.duration(kickTime.value.value))
             return availableTime.isSameOrBefore(moment())
         })
     })

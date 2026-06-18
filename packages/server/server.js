@@ -8,7 +8,7 @@ import 'dotenv/config'
 
 import app from './app.js'
 import apolloServer from './apollo/apolloServer.js'
-import { expressMiddleware } from '@apollo/server/express4'
+import { expressMiddleware } from '@as-integrations/express5';
 
 const PORT = process.env.PORT ?? 9000
 const GQL_PATH = process.env.GQL_PATH ?? '/gql'
@@ -25,11 +25,11 @@ if(process.env.DB_CONNECTION_STRING_FILE) {
 }
 
 mongoose.set('strictQuery', false)
-mongoose.connect(connectionString)
+let mongooseConnection = await mongoose.connect(connectionString)
 
 app.server = http.createServer(app)
 
-const apollo = apolloServer(app, GQL_PATH)
+const apollo = apolloServer(app, GQL_PATH, mongooseConnection)
 
 await apollo.start()
 
