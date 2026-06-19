@@ -53,11 +53,19 @@
                     <button class="btn btn-danger" @click="showCheckinModal()"><i class="bi bi-box-arrow-in-down"></i>
                         Checkin/Return</button>
                 </div>
-                <div class="btn-group" role="group" aria-label="Second group">
+                <div class="btn-group flex-wrap" role="group" aria-label="Second group">
                     <button class="btn btn-info" @click="showSetFieldsModal()"><i class="bi bi-pencil"></i> Set
                         Fields</button>
                     <button class="btn btn-info" @click="toggleAvailability()"><i class="bi bi-toggle-off"></i> Toggle
                         Availability</button>
+                    <div class="btn-group">
+                        <button class="btn btn-info dropdown-toggle" :id="'swapStation' + station._id" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-arrow-left-right"></i> Swap Station
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" v-for="otherStation in swappableStations">{{otherStation.name}}</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -82,7 +90,24 @@ import {useToast} from 'vue-toast-notification'
 const toast = useToast()
 
 const props = defineProps({
-    stationId: String
+    stationId: String,
+    fullCurrentStationList: Array,
+})
+
+const swappableStations = computed(() => {
+    let swapList = props.fullCurrentStationList
+        .filter(otherStation => otherStation._id !== props.stationId) // filter out ourselves
+    if (station.value)
+        swapList = swapList
+            .filter(otherStation =>
+                !station.value.currentConsole ||
+                otherStation.consoleOptions.includes(station.value.currentConsole
+            ))
+            .filter(otherStation =>
+                !otherStation.currentConsole ||
+                (station.value.consoleOptions && station.value.consoleOptions.includes(otherStation.currentConsole)
+            )) //Ensure that both stations can take the compatible
+    return swapList
 })
 
 const isLoading = useQueryLoading()
@@ -295,7 +320,7 @@ function toggleAvailability() {
 }
 function updateTick() {
     getFormattedTimeFromNow()
-    updateBorderVarient()
+    updateBorderVariant()
 }
 function getFormattedTimeFromNow() {
     if (!isLoading.value && station.value.checkoutTime !== null) {
@@ -304,7 +329,7 @@ function getFormattedTimeFromNow() {
         timeSinceCheckout.value = ''
     }
 }
-function updateBorderVarient() {
+function updateBorderVariant() {
     if (station.value !== null) {
         if (station.value.status === stationStates.NOT_AVAILABLE) {
             borderVarient.value = 'secondary'
@@ -339,7 +364,7 @@ function isCheckedOut() {
 
 onMounted(() => {
     updateTick()
-    setInterval(updateTick, 1000)  
+    setInterval(updateTick, 1000)
 })
 
 onUnmounted(() => {

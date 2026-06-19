@@ -1,4 +1,5 @@
-import { Tooltip, Popover } from 'bootstrap'
+import { Tooltip, Popover, Dropdown } from 'bootstrap'
+import '@popperjs/core'
 
 const tooltip = {
     mounted(el) {
@@ -8,11 +9,19 @@ const tooltip = {
 
 const popover = {
     mounted(el) {
-        const popover = new Popover(el)
+        const popover = new Popover(el, {})
+    }
+}
+
+const dropdown = {
+    mounted(el) {
+        const dropdown = new Dropdown(el)
+        console.log(dropdown)
     }
 }
 
 export default {
     tooltip,
-    popover
+    popover,
+    dropdown,
 }
