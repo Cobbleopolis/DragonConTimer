@@ -15,6 +15,7 @@ const GQL_PATH = process.env.GQL_PATH ?? '/gql'
 
 app.use(cors())
 
+console.log("Connecting to mongodb...")
 let connectionString = process.env.DB_CONNECTION_STRING
 if(process.env.DB_CONNECTION_STRING_FILE) {
     try {
@@ -26,6 +27,12 @@ if(process.env.DB_CONNECTION_STRING_FILE) {
 
 mongoose.set('strictQuery', false)
 let mongooseConnection = await mongoose.connect(connectionString)
+
+// let consolePrint = setInterval(() => {
+//     mongooseConnection.connections.forEach(conn => {console.log(conn)})
+//     console.log("-----")
+// }, 500)
+console.log("Connected to mongodb")
 
 app.server = http.createServer(app)
 

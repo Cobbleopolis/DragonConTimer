@@ -2,10 +2,11 @@ import { ApolloServer } from '@apollo/server'
 import schema from './schema.js'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
-import { MongodbPubSub } from 'graphql-mongoose-subscriptions'
+// import { MongodbPubSub } from 'graphql-mongoose-subscriptions'
 
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import {PubSub} from "graphql-subscriptions";
 
 export default function(app, path, mongoose) {
 
@@ -18,9 +19,11 @@ export default function(app, path, mongoose) {
     })
 
     const maxListeners = process.env.MAX_LISTENERS | 0 ?? 1024
-    const useDynamicListeners = (process.env.USE_DYNAMIC_LISTENERS ?? 'false').toLowerCase() === 'true'
+    const useInfiniteListeners = (process.env.USE_INFINITE_LISTENERS ?? process.env.USE_DYNAMIC_LISTENERS ?? 'false').toLowerCase() === 'true'
 
-    const pubsub = new MongodbPubSub({mongoose: mongoose})
+    const pubsub = new PubSub()
+    pubsub.ee.setMaxListeners(useInfiniteListeners ? Infinity : maxListeners)
+
     const apolloSchema = schema(pubsub)
     const serverCleanup = useServer({ schema: apolloSchema }, wsServer)
 
