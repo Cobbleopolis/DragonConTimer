@@ -1,6 +1,6 @@
 <template>
-    <div :class="'card mb-2 border-' + borderVarient">
-        <div :class="'card-header text-bg-' + borderVarient">
+    <div :class="'card mb-2 border-' + borderVariant">
+        <div :class="'card-header text-bg-' + borderVariant">
             <span v-if="!isLoading">{{ station.name }}&nbsp;({{ stationStates.getDisplayName(station.status) }})</span>
             <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
         </div>
@@ -276,7 +276,7 @@ onError((error) => {
 const { getSetting } = UseGlobalSettings()
 const warnTime = getSetting('warnTime')
 const kickTime = getSetting('kickTime')
-const borderVarient = ref('default')
+const borderVariant = ref('default')
 
 function showCheckoutModal() {
     checkoutModal.value.show({
@@ -332,29 +332,29 @@ function getFormattedTimeFromNow() {
 function updateBorderVariant() {
     if (station.value !== null) {
         if (station.value.status === stationStates.NOT_AVAILABLE) {
-            borderVarient.value = 'secondary'
+            borderVariant.value = 'secondary'
         } else if (station.value.status === stationStates.CHECKED_OUT) {
             const duration = moment.duration(moment().diff(moment(station.value.checkoutTime))).asMilliseconds()
             const kickMillis = moment.duration(kickTime.value.value).asMilliseconds()
             const warnMillis = moment.duration(warnTime.value.value).asMilliseconds()
             if (duration >= kickMillis) {
-                if (borderVarient.value !== 'danger') {
+                if (borderVariant.value !== 'danger') {
                     toast.error(station.value.name + ' needs to be kicked')
                 }
-                borderVarient.value = 'danger'
+                borderVariant.value = 'danger'
             } else if (duration >= warnMillis) {
-                if (borderVarient.value !== 'warning') {
+                if (borderVariant.value !== 'warning') {
                     toast.warning(station.value.name + ' has ' + moment.duration(moment().diff(moment(station.value.checkoutTime).add(kickMillis, 'millisecond'))).humanize() + ' left')
                 }
-                borderVarient.value = 'warning'
+                borderVariant.value = 'warning'
             } else {
-                borderVarient.value = 'success'
+                borderVariant.value = 'success'
             }
         } else {
-            borderVarient.value = 'default'
+            borderVariant.value = 'default'
         }
     } else {
-        borderVarient.value = 'default'
+        borderVariant.value = 'default'
     }
 }
 
