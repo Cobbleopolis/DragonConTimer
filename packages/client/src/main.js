@@ -142,6 +142,7 @@ app.use(router)
 app.use(ToastPlugin, toastOptions)
 app.directive('tooltip', BootstrapDirectives.tooltip)
 app.directive('popover', BootstrapDirectives.popover)
+app.directive('dropdown', BootstrapDirectives.dropdown)
 
 app.config.globalProperties.$themes = new Themes()
 

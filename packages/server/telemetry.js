@@ -5,7 +5,7 @@ import momentDurationSetup from 'moment-duration-format'
 
 momentDurationSetup(moment)
 
-const fileName = 'DCT-Telemetry-Computers-2025.json'
+const fileName = 'DCT-Telemetry-Boardgames-2025.json'
 
 fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
     if (err) {
@@ -21,6 +21,7 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
 
     const individualGroups = {}
     const stations = {}
+    const games = {}
 
     for (const telemetryEntry of telemetry) {
         if (moment(telemetryEntry.timestamp).year() !== 2024)
@@ -49,8 +50,6 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
                     lastUpdate: moment(telemetryEntry.timestamp),
                     checkouts: []
                 }
-                console.log("Adding station")
-                console.log(station)
             } else {
                 let checkoutEntry = {
                     start: moment(station.lastUpdate),
