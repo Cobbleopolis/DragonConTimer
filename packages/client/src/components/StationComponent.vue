@@ -395,7 +395,7 @@ async function swapWithStation(otherStation) {
 
 onMounted(() => {
     updateTick()
-    setInterval(updateTick, 1000)
+    setInterval(updateTick, 100)
 })
 
 onUnmounted(() => {
