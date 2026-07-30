@@ -38,7 +38,7 @@
                     <input type="text" class="form-control" :id="'checkoutWarning' + consoleObj._id" v-model="formCheckoutWarning">
                 </div>
                 <div class="mb-4">
-                    <label :for="'checkinWarning' + consoleObj._id" class="form-label">Checkout Warning</label>
+                    <label :for="'checkinWarning' + consoleObj._id" class="form-label">Checkin/Return Warning</label>
                     <input type="text" class="form-control" :id="'checkinWarning' + consoleObj._id" v-model="formCheckinWarning">
                 </div>
             </div>
