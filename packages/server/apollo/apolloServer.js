@@ -2,15 +2,13 @@ import { ApolloServer } from '@apollo/server'
 import schema from './schema.js'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
-import { PubSub } from 'graphql-subscriptions'
-// import { RedisPubSub } from 'graphql-redis-subscriptions'
-// import Redis from 'ioredis';
 // import { MongodbPubSub } from 'graphql-mongoose-subscriptions'
 
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import {PubSub} from "graphql-subscriptions";
 
-export default function(app, path) {
+export default function(app, path, mongoose) {
 
     const wsServer = new WebSocketServer({
         // This is the `httpServer` we created in a previous step.
@@ -20,34 +18,12 @@ export default function(app, path) {
         path,
     })
 
-
-    let redisConnectionString = process.env.REDIS_CONNECTION_STRING
-    if(process.env.REDIS_CONNECTION_STRING_FILE) {
-        try {
-            redisConnectionString = fs.readFileSync(process.env.REDIS_CONNECTION_STRING_FILE, 'utf-8').trim()
-        } catch (err) {
-            console.error(err)
-        }
-    }
-
     const maxListeners = process.env.MAX_LISTENERS | 0 ?? 1024
-    const useDynamicListeners = (process.env.USE_DYNAMIC_LISTENERS ?? 'false').toLowerCase() === 'true'
+    const useInfiniteListeners = (process.env.USE_INFINITE_LISTENERS ?? process.env.USE_DYNAMIC_LISTENERS ?? 'false').toLowerCase() === 'true'
 
     const pubsub = new PubSub()
-    // const pubsub = new RedisPubSub({
-    //     publisher: new Redis(redisConnectionString),
-    //     subscriber: new Redis(redisConnectionString)
-    // })
-    // const pubsub = new MongodbPubSub()
-    // console.log(pubsub.ee.getMaxListeners())
-    pubsub.ee.setMaxListeners(maxListeners)
-    if (useDynamicListeners) {
-    pubsub.ee.on('connection', () => { // This should let us constantly resize our pubsub listeners
-            if (pubsub.ee.listenerCount === pubsub.ee.getMaxListeners()) {
-                pubsub.ee.setMaxListeners(pubsub.ee.getMaxListeners() * 2)
-            }
-        })
-    }
+    pubsub.ee.setMaxListeners(useInfiniteListeners ? Infinity : maxListeners)
+
     const apolloSchema = schema(pubsub)
     const serverCleanup = useServer({ schema: apolloSchema }, wsServer)
 

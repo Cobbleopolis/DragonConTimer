@@ -1,6 +1,6 @@
 <template>
-    <div :class="'card mb-2 border-' + borderVarient">
-        <div :class="'card-header text-bg-' + borderVarient">
+    <div :class="'card mb-2 border-' + borderVariant">
+        <div :class="'card-header text-bg-' + borderVariant">
             <span v-if="!isLoading">{{ station.name }}&nbsp;({{ stationStates.getDisplayName(station.status) }})</span>
             <span v-else class="placeholder-glow"><span class="placeholder col-2"></span></span>
         </div>
@@ -53,11 +53,19 @@
                     <button class="btn btn-danger" @click="showCheckinModal()"><i class="bi bi-box-arrow-in-down"></i>
                         Checkin/Return</button>
                 </div>
-                <div class="btn-group" role="group" aria-label="Second group">
+                <div class="btn-group flex-wrap" role="group" aria-label="Second group">
                     <button class="btn btn-info" @click="showSetFieldsModal()"><i class="bi bi-pencil"></i> Set
                         Fields</button>
                     <button class="btn btn-info" @click="toggleAvailability()"><i class="bi bi-toggle-off"></i> Toggle
                         Availability</button>
+                    <div class="btn-group">
+                        <button class="btn btn-info dropdown-toggle" :id="'swapStation' + station._id" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-arrow-left-right"></i> Swap Station
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" v-for="otherStation in swappableStations" @click="swapWithStation(otherStation)">{{otherStation.name}}</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -82,7 +90,24 @@ import {useToast} from 'vue-toast-notification'
 const toast = useToast()
 
 const props = defineProps({
-    stationId: String
+    stationId: String,
+    fullCurrentStationList: Array,
+})
+
+const swappableStations = computed(() => {
+    let swapList = props.fullCurrentStationList
+        .filter(otherStation => otherStation._id !== props.stationId) // filter out ourselves
+    if (station.value)
+        swapList = swapList
+            .filter(otherStation =>
+                !station.value.currentConsole ||
+                (otherStation.consoleOptions && otherStation.consoleOptions.includes(station.value.currentConsole))
+            )
+            .filter(otherStation =>
+                !otherStation.currentConsole ||
+                (station.value.consoleOptions && station.value.consoleOptions.includes(otherStation.currentConsole))
+            ) //Ensure that both stations can take the compatible
+    return swapList
 })
 
 const isLoading = useQueryLoading()
@@ -130,7 +155,7 @@ query ConsoleByIds($ids: [MongoID!]!, $sort: SortFindByIdsConsoleInput) {
         name
     }
 }`, () => ({
-    ids: stationReq.result.value?.stationById.consoleOptions,
+    ids: stationReq.result.value?.stationById.consoleOptions ?? [],
     sort: '_ID_ASC'
 }), () => ({
     enabled: consoleReqEnabled.value && !stationReq.isLoading
@@ -143,7 +168,7 @@ const currentDisplayExtras = computed(() => {
     if (!consoleOptions.value || !station.value || !station.value.currentConsole) {
         return []
     }
-    const curConsole = consoleOptions.value.find(c => c._id == station.value.currentConsole)
+    const curConsole = consoleOptions.value.find(c => c._id === station.value.currentConsole)
     if (!curConsole)
         return []
     return station.value.currentExtras
@@ -251,7 +276,7 @@ onError((error) => {
 const { getSetting } = UseGlobalSettings()
 const warnTime = getSetting('warnTime')
 const kickTime = getSetting('kickTime')
-const borderVarient = ref('default')
+const borderVariant = ref('default')
 
 function showCheckoutModal() {
     checkoutModal.value.show({
@@ -276,7 +301,7 @@ function showSetFieldsModal() {
 
 function toggleAvailability() {
     isSubmitting.value = true
-    let newState = stationStates.DEFAULT
+    let newState
     if (station.value.status !== stationStates.NOT_AVAILABLE) {
         newState = stationStates.NOT_AVAILABLE
     } else {
@@ -287,7 +312,7 @@ function toggleAvailability() {
         }
     }
     updateStation({
-        id: props.stationId,
+        id: station.value._id,
         record: {
             status: newState
         }
@@ -295,7 +320,7 @@ function toggleAvailability() {
 }
 function updateTick() {
     getFormattedTimeFromNow()
-    updateBorderVarient()
+    updateBorderVariant()
 }
 function getFormattedTimeFromNow() {
     if (!isLoading.value && station.value.checkoutTime !== null) {
@@ -304,32 +329,32 @@ function getFormattedTimeFromNow() {
         timeSinceCheckout.value = ''
     }
 }
-function updateBorderVarient() {
+function updateBorderVariant() {
     if (station.value !== null) {
         if (station.value.status === stationStates.NOT_AVAILABLE) {
-            borderVarient.value = 'secondary'
+            borderVariant.value = 'secondary'
         } else if (station.value.status === stationStates.CHECKED_OUT) {
             const duration = moment.duration(moment().diff(moment(station.value.checkoutTime))).asMilliseconds()
             const kickMillis = moment.duration(kickTime.value.value).asMilliseconds()
             const warnMillis = moment.duration(warnTime.value.value).asMilliseconds()
             if (duration >= kickMillis) {
-                if (borderVarient.value != 'danger') {
+                if (borderVariant.value !== 'danger') {
                     toast.error(station.value.name + ' needs to be kicked')
                 }
-                borderVarient.value = 'danger'
+                borderVariant.value = 'danger'
             } else if (duration >= warnMillis) {
-                if (borderVarient.value != 'warning') {
+                if (borderVariant.value !== 'warning') {
                     toast.warning(station.value.name + ' has ' + moment.duration(moment().diff(moment(station.value.checkoutTime).add(kickMillis, 'millisecond'))).humanize() + ' left')
                 }
-                borderVarient.value = 'warning'
+                borderVariant.value = 'warning'
             } else {
-                borderVarient.value = 'success'
+                borderVariant.value = 'success'
             }
         } else {
-            borderVarient.value = 'default'
+            borderVariant.value = 'default'
         }
     } else {
-        borderVarient.value = 'default'
+        borderVariant.value = 'default'
     }
 }
 
@@ -337,9 +362,40 @@ function isCheckedOut() {
     return station.value.status === stationStates.CHECKED_OUT
 }
 
+async function swapWithStation(otherStation) {
+    const tmp = structuredClone(otherStation)
+    const otherUpdate = {
+        checkoutNotes: station.value.checkoutNotes,
+        checkoutTime: station.value.checkoutTime,
+        currentConsole: station.value.currentConsole,
+        currentExtras: station.value.currentExtras.map(({__typename, ...keepAttrs}) => keepAttrs), //Removing metadata to match update query
+        currentGame: station.value.currentGame,
+        playerName: station.value.playerName,
+        status: station.value.status === stationStates.NOT_AVAILABLE ? stationStates.DEFAULT : station.value.status
+    }
+    const selfUpdate = {
+        checkoutNotes: tmp.checkoutNotes,
+        checkoutTime: tmp.checkoutTime,
+        currentConsole: tmp.currentConsole,
+        currentExtras: tmp.currentExtras.map(({__typename, ...keepAttrs}) => keepAttrs), //Removing metadata to match update query
+        currentGame: tmp.currentGame,
+        playerName: tmp.playerName,
+        status: tmp.status === stationStates.NOT_AVAILABLE ? stationStates.DEFAULT : tmp.status
+    }
+    await updateStation({
+        id: station.value._id,
+        record: selfUpdate
+    })
+    await updateStation({
+        id: tmp._id,
+        record: otherUpdate
+    })
+
+}
+
 onMounted(() => {
     updateTick()
-    setInterval(updateTick, 1000)  
+    setInterval(updateTick, 100)
 })
 
 onUnmounted(() => {

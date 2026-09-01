@@ -18,7 +18,7 @@
                         <RouterLink class="nav-link" to="/availability">Availability</RouterLink>
                     </li>
                     <li class="nav-item">
-                        <RouterLink class="nav-link" to="/waitlist">Waitlist</RouterLink>
+                        <RouterLink class="nav-link" to="/waitlist">Waitlist <span v-if="waitlistEntries.length > 0" class="badge text-bg-danger">{{waitlistEntries.length}}</span></RouterLink>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -62,8 +62,50 @@ import ThemeSwitcher from './ThemeSwitcher.vue'
 import common from '@dct/common'
 
 import UseGlobalSettings from '../useables/UseGlobalSettings'
+import {useQuery} from "@vue/apollo-composable";
+import gql from "graphql-tag";
+import UseUpdateQuery from "@/useables/UseUpdateQuery";
 
 const { getSetting } = UseGlobalSettings()
 const appName = getSetting('appName')
 const hasAppName = computed(() => appName.value && appName.value.value)
+
+const waitlistEntryQuery = useQuery(gql`
+query WaitlistEntry {
+  waitlistEntry {
+    _id
+  }
+}`)
+
+waitlistEntryQuery.subscribeToMore({
+    document: gql`
+    subscription WaitlistEntryCreate {
+        waitlistEntryCreate {
+            _id
+        }
+    }`,
+    updateQuery: UseUpdateQuery.standardCollectionCreateUpdateQuery('waitlistEntry', 'waitlistEntryCreate')
+})
+
+waitlistEntryQuery.subscribeToMore({
+    document: gql`
+    subscription WaitlistEntryUpdate {
+        waitlistEntryUpdate {
+            _id
+        }
+    }`,
+    updateQuery: UseUpdateQuery.standardCollectionUpdateUpdateQuery('waitlistEntry', 'waitlistEntryUpdate')
+})
+
+waitlistEntryQuery.subscribeToMore({
+    document: gql`
+    subscription WaitlistEntryRemove {
+        waitlistEntryRemove {
+            _id
+        }
+    }`,
+    updateQuery: UseUpdateQuery.standardCollectionRemoveUpdateQuery('waitlistEntry', 'waitlistEntryRemove')
+})
+
+const waitlistEntries = computed(() => waitlistEntryQuery.result.value?.waitlistEntry ?? [] )
 </script>

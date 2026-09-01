@@ -29,7 +29,7 @@
         <template v-if="!isLoading">
             <button class="btn btn-primary mb-2" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilters"
                 aria-controls="offcanvasFilters">Filters</button>
-            <StationComponent :station-id="station._id" v-for="station of filteredStations" :key="station._id" />
+            <StationComponent :station-id="station._id" :full-current-station-list="stations" v-for="station of filteredStations" :key="station._id" />
         </template>
         <template v-else>
             <div class="d-flex justify-content-center">
@@ -52,9 +52,19 @@ const stationListReq = useQuery(gql`
 query Query($sort: SortFindManyStationInput) {
     station(sort: $sort) {
         _id
+        checkoutTime
         consoleOptions
+        currentConsole
+        currentGame
+        currentExtras {
+            count
+            extraId
+        }
+        name
+        notes
+        checkoutNotes
+        playerName
         status
-        orderPriority
     }
 }`, {
     sort: 'ORDERPRIORITY_ASC'
@@ -65,9 +75,19 @@ stationListReq.subscribeToMore({
     subscription StationCreate {
         stationCreate {
             _id
+            checkoutTime
             consoleOptions
+            currentConsole
+            currentGame
+            currentExtras {
+                count
+                extraId
+            }
+            name
+            notes
+            checkoutNotes
+            playerName
             status
-            orderPriority
         }
     }`,
     updateQuery: UseUpdateQuery.standardCollectionCreateUpdateQuery('station', 'stationCreate')

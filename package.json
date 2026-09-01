@@ -1,6 +1,6 @@
 {
   "name": "dragoncon-timer",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Timer for DragonCon LAN Gaming",
   "main": "server.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "build": "lerna run build --stream",
     "version": "lerna version --no-git-tag-version --force-publish --no-push",
     "lint": "eslint **/* --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "telemetry": "lerna run telemetry --scope=@dct/server"
   },
   "type": "module",
   "author": "Cobbleopolis",
@@ -19,10 +20,11 @@
     "@babel/eslint-parser": "^7.22.9",
     "@babel/plugin-syntax-import-assertions": "^7.22.5",
     "eslint": "^8.26.0",
-    "lerna": "^6.0.3",
+    "lerna": "^9.0.7",
     "nodemon": "^2.0.20"
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "packageManager": "yarn@4.15.0"
 }
