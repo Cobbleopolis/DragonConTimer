@@ -12,6 +12,12 @@ const excludeYears = [
     2024
 ]
 
+const sessions = {}
+
+const individualGroups = {}
+const stations = {}
+const games = {}
+
 fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
     if (err) {
         console.log(err)
@@ -24,50 +30,58 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
         console.log(parseError);
     }
 
-    const sessions = {}
-
-    const individualGroups = {}
-    const stations = {}
-    const games = {}
 
     for (const telemetryEntry of telemetry) {
         if (excludeYears.includes(moment(telemetryEntry.timestamp).year()))
             continue;
+        const stationId = telemetryEntry.mutationArgs._id
         if (telemetryEntry.eventType === "stationCreate") {
-            stations[telemetryEntry.oldState._id] = createStation(telemetryEntry.oldState.name, telemetryEntry.oldState.status, telemetryEntry.timestamp)
+            stations[stationId] = createStation(telemetryEntry.oldState.name, telemetryEntry.oldState.status, telemetryEntry.timestamp)
         }
         if (telemetryEntry.eventType === "stationUpdate") {
-            let station = stations[telemetryEntry.mutationArgs._id]
+
+            let station = stations[stationId]
+            const gameName = `${telemetryEntry.oldState.currentGame} (${telemetryEntry.oldState.currentConsole})`
+            let game = games[gameName]
+
+            const groupName = getGroupNameFromRawName(telemetryEntry.oldState.playerName)
+            let group = individualGroups[groupName]
 
             if (!station) {
-                if (!telemetryEntry.oldState) {
-                    continue;
-                }
                 station = createStation(telemetryEntry.oldState.name, telemetryEntry.oldState.status, telemetryEntry.timestamp)
             }
 
-            let session = createSession(moment(station.lastUpdate))
+            if (!game) {
+                game = createGame(gameName)
+            }
+
+            if (!group) {
+                group = createGroup(groupName)
+            }
+
+            let session = createSession(moment(station.lastUpdate), moment(telemetryEntry.timestamp))
             sessions[session.id] = session
 
-            let fromState = station.state
+            let fromState = telemetryEntry.oldState.status
             let toState = telemetryEntry.mutationArgs.record.status
             if (
                 (fromState === "CHECKED_OUT" && toState === "DEFAULT") ||
-                (fromState === "CHECKED_OUT" && toState === "CHECKED_OUT")
-            ) { //Returning
-                station.sessions.push(session.id)
+                (fromState === "CHECKED_OUT" && (!toState || toState === "CHECKED_OUT") ||
+                (fromState === "CHECKED_OUT" && toState === "NOT_AVAILABLE"))
+            ) { //Returning & updating
+                station.addSessionId(session.id)
+                game.addSessionId(session.id)
+                group.addSessionId(session.id)
+                // station.sessions.push(session.id)
             }
 
 
             station.state = telemetryEntry.mutationArgs.record.status
             station.lastUpdate = moment(telemetryEntry.timestamp)
 
-            if (telemetryEntry.mutationArgs.record.playerName) {
-                let rawName = telemetryEntry.mutationArgs.record.playerName.toLowerCase()
-            }
-
-            stations[telemetryEntry.mutationArgs._id] = station
-
+            stations[stationId] = station
+            games[gameName] = game
+            individualGroups[groupName] = group
 
 
             // let station = stations[telemetryEntry.mutationArgs._id]
@@ -142,12 +156,59 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
         }
     }
     // Printing info
+    console.log("Stations: ")
+    let totalStationTime = moment.duration(0)
+    let totalStationCheckouts = 0
     for (const k in stations) {
         let station = stations[k]
         if (!station)
             continue;
-        console.log(`${k} - ${station.name} - ${station.sessions.length}`)
+        let stationTime = station.getTotalCheckoutTime()
+        totalStationTime = totalStationTime.add(stationTime)
+        totalStationCheckouts += station.sessionIds.length
+        const printName = (station.name.indexOf(',') !== -1) ? "\"" + station.name + "\"" : station.name
+        console.log(`${k} - ${printName} - ${station.sessionIds.length} - ${stationTime.format("HH:mm:ss.SSS")}`)
     }
+    console.log("Total Station Checkouts/Updates: " + totalStationCheckouts)
+    console.log(`Total Time: ${totalStationTime.format("HH:mm:ss.SSS")}`)
+
+    console.log("Games: ")
+    let totalGameTime = moment.duration(0)
+    let totalGameCheckouts = 0
+    for (const k in games) {
+        let game = games[k]
+        if (!game)
+            continue;
+        let gameTime = game.getTotalCheckoutTime()
+        totalGameTime = totalGameTime.add(gameTime)
+        totalGameCheckouts += game.sessionIds.length
+        const printName = (game.name.indexOf(',') !== -1) ? "\"" + game.name + "\"" : game.name
+        console.log(`${printName}, ${game.sessionIds.length}, ${gameTime.format("HH:mm:ss.SSS")}`)
+    }
+    console.log("Total Game Checkouts/Updates: " + totalGameCheckouts)
+    console.log(`Total Time: ${totalGameTime.format("HH:mm:ss.SSS")}`)
+
+    console.log("Groups:")
+    let totalGroupTime = moment.duration(0)
+    let totalGroupCheckouts = 0
+    let uniquePlayerCount = 0
+    let totalPlayerCount = 0
+    for (const k in individualGroups) {
+        let group = individualGroups[k]
+        if (!group)
+            continue;
+        let groupTime = group.getTotalCheckoutTime()
+        totalGroupTime = totalGroupTime.add(groupTime)
+        totalGroupCheckouts += group.sessionIds.length
+        uniquePlayerCount += group.individualCount
+        totalPlayerCount += group.individualCount * group.sessionIds.length
+        const printName = (group.name.indexOf(',') !== -1) ? "\"" + group.name + "\"" : group.name
+        console.log(`${printName}, ${group.individualCount}, ${group.sessionIds.length}, ${groupTime.format("HH:mm:ss.SSS")}`)
+    }
+    console.log("Total Game Checkouts/Updates: " + totalGroupCheckouts)
+    console.log("Total Time: " + totalGroupTime.format("HH:mm:ss.SSS"))
+    console.log("Unique Player Count: " + uniquePlayerCount)
+    console.log("Total Player Count: " + totalPlayerCount)
 //     console.log("Station Stats")
 //     console.log()
 //     let totalTime = moment.duration(0)
@@ -183,23 +244,89 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
 })
 
 function createStation(name, status, lastUpdateTimestamp) {
+    let station = createSessionContainer(name)
+    station.state = status
+    station.lastUpdate = moment(lastUpdateTimestamp)
+
+    return station
+}
+
+function createGame(gameName) {
+    return createSessionContainer(gameName)
+}
+
+function createGroup(groupName) {
+    let group = createSessionContainer(groupName)
+    group.individualCount = getPlayerCountFromGroupName(groupName)
+    return group
+}
+
+function createSessionContainer(name) {
     return {
-        totalCheckoutTime: moment.duration(0),
-        state: status,
-        name: name,
-        lastUpdate: moment(lastUpdateTimestamp),
-        sessions: []
+        name,
+        sessionIds: [],
+        addSessionId(id) {
+            if (!this.sessionIds.includes(id))
+                this.sessionIds.push(id)
+        },
+        getTotalCheckoutTime() {
+            let totalDuration = moment.duration(0)
+            for (const sessionId of this.sessionIds) {
+                const session = sessions[sessionId]
+                const sessionDuration = session.getSessionDuration()
+                totalDuration = moment.duration(totalDuration.add(sessionDuration))
+            }
+            return totalDuration
+        }
     }
 }
 
 function createSession(start, end) {
+    let sessionId = crypto.randomUUID()
+    while (sessions[sessionId]) //Ensure we don't get UUID collisions
+        sessionId = crypto.randomUUID()
     return {
-        id: crypto.randomUUID(),
+        id: sessionId,
         start,
-        end
+        end,
+        getSessionDuration() {
+            return moment.duration(moment(this.end).diff(this.start))
+        }
     }
 }
 
 function getSessionDuration(session) {
     return moment.duration(moment(session.end).diff(session.start))
+}
+
+function getGroupNameFromRawName(rawName) {
+    if (!rawName)
+        return rawName
+    return rawName.toLowerCase().trim()
+}
+
+function getPlayerCountFromGroupName(groupName) {
+    let playerCount = 0
+    const splitNames = groupName.split(/[,+\/]/)
+    for (const individualName of splitNames) {
+        const name = individualName.trim()
+        if (!name)
+            continue
+        if (isNaN(name) && isNaN(parseFloat(name))) {
+            const multiplerRegex = /\w+\s+x(\d+)/
+            const multiplierMatches = name.match(multiplerRegex)
+            if (multiplierMatches > 0) {
+                playerCount += parseFloat(multiplierMatches[1])
+            } else {
+                playerCount++
+            }
+        } else {
+            playerCount += parseFloat(name)
+            if (isNaN(playerCount)) {
+                console.log("Error Processing name: " + name)
+                process.exit(1)
+            }
+        }
+    }
+    return playerCount
 }
