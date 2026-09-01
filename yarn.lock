@@ -2096,7 +2096,7 @@ __metadata:
   resolution: "@dct/client@workspace:packages/client"
   dependencies:
     "@apollo/client": "npm:^3.10.4"
-    "@dct/common": "npm:^3.2.0-alpha.0"
+    "@dct/common": "npm:^3.2.0"
     "@popperjs/core": "npm:^2.11.8"
     "@rushstack/eslint-patch": "npm:^1.16.1"
     "@vitejs/plugin-vue": "npm:^6.0.7"
@@ -2128,7 +2128,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dct/common@npm:^3.2.0-alpha.0, @dct/common@workspace:packages/common":
+"@dct/common@npm:^3.2.0, @dct/common@workspace:packages/common":
   version: 0.0.0-use.local
   resolution: "@dct/common@workspace:packages/common"
   languageName: unknown
@@ -2140,7 +2140,7 @@ __metadata:
   dependencies:
     "@apollo/server": "npm:^4.10.4"
     "@as-integrations/express5": "npm:^1.1.2"
-    "@dct/common": "npm:^3.2.0-alpha.0"
+    "@dct/common": "npm:^3.2.0"
     apollo-datasource-mongodb: "npm:^0.6.0"
     body-parser: "npm:^2.2.2"
     copyfiles: "npm:^2.4.1"
