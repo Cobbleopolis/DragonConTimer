@@ -297,9 +297,9 @@ function createSession(start, end) {
     }
 }
 
-function getSessionDuration(session) {
-    return moment.duration(moment(session.end).diff(session.start))
-}
+// function getSessionDuration(session) {
+//     return moment.duration(moment(session.end).diff(session.start))
+// }
 
 function getGroupNameFromRawName(rawName) {
     if (!rawName)
@@ -315,8 +315,8 @@ function getPlayerCountFromGroupName(groupName) {
         if (!name)
             continue
         if (isNaN(name) && isNaN(parseFloat(name))) {
-            const multiplerRegex = /\w+\s+x(\d+)/
-            const multiplierMatches = name.match(multiplerRegex)
+            const multiplierRegex = /\w+\s+x(\d+)/
+            const multiplierMatches = name.match(multiplierRegex)
             if (multiplierMatches > 0) {
                 playerCount += parseFloat(multiplierMatches[1])
             } else {
