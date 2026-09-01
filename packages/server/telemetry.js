@@ -6,7 +6,9 @@ import momentDurationSetup from 'moment-duration-format'
 
 momentDurationSetup(moment)
 
-const fileName = 'DCT-Telemetry-Consoles-2025.json'
+const fileName = 'DCT-Telemetry-Boardgames-2025.json'
+
+const appendConsoleId = false
 
 const excludeYears = [
     2024
@@ -41,7 +43,7 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
         if (telemetryEntry.eventType === "stationUpdate") {
 
             let station = stations[stationId]
-            const gameName = `${telemetryEntry.oldState.currentGame} (${telemetryEntry.oldState.currentConsole})`
+            const gameName = appendConsoleId ? `${telemetryEntry.oldState.currentGame} (${telemetryEntry.oldState.currentConsole})` : telemetryEntry.oldState.currentGame
             let game = games[gameName]
 
             const groupName = getGroupNameFromRawName(telemetryEntry.oldState.playerName)
@@ -167,10 +169,10 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
         totalStationTime = totalStationTime.add(stationTime)
         totalStationCheckouts += station.sessionIds.length
         const printName = (station.name.indexOf(',') !== -1) ? "\"" + station.name + "\"" : station.name
-        console.log(`${k} - ${printName} - ${station.sessionIds.length} - ${stationTime.format("HH:mm:ss.SSS")}`)
+        console.log(`${k}", "${printName}", "${station.sessionIds.length}", "${stationTime.format("HH:mm:ss.SSS")}"`)
     }
     console.log("Total Station Checkouts/Updates: " + totalStationCheckouts)
-    console.log(`Total Time: ${totalStationTime.format("HH:mm:ss.SSS")}`)
+    console.log(`Total Time: "${totalStationTime.format("HH:mm:ss.SSS")}"`)
 
     console.log("Games: ")
     let totalGameTime = moment.duration(0)
@@ -183,10 +185,10 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
         totalGameTime = totalGameTime.add(gameTime)
         totalGameCheckouts += game.sessionIds.length
         const printName = (game.name.indexOf(',') !== -1) ? "\"" + game.name + "\"" : game.name
-        console.log(`${printName}, ${game.sessionIds.length}, ${gameTime.format("HH:mm:ss.SSS")}`)
+        console.log(`${printName}, "${game.sessionIds.length}", "${gameTime.format("HH:mm:ss.SSS")}"`)
     }
     console.log("Total Game Checkouts/Updates: " + totalGameCheckouts)
-    console.log(`Total Time: ${totalGameTime.format("HH:mm:ss.SSS")}`)
+    console.log(`Total Time: "${totalGameTime.format("HH:mm:ss.SSS")}"`)
 
     console.log("Groups:")
     let totalGroupTime = moment.duration(0)
@@ -203,10 +205,10 @@ fs.readFile(path.join('.', fileName), 'utf8', (err, data) => {
         uniquePlayerCount += group.individualCount
         totalPlayerCount += group.individualCount * group.sessionIds.length
         const printName = (group.name.indexOf(',') !== -1) ? "\"" + group.name + "\"" : group.name
-        console.log(`${printName}, ${group.individualCount}, ${group.sessionIds.length}, ${groupTime.format("HH:mm:ss.SSS")}`)
+        console.log(`${printName}, "${group.individualCount}", "${group.sessionIds.length}", "${groupTime.format("HH:mm:ss.SSS")}"`)
     }
     console.log("Total Game Checkouts/Updates: " + totalGroupCheckouts)
-    console.log("Total Time: " + totalGroupTime.format("HH:mm:ss.SSS"))
+    console.log(`Total Time: "${totalGroupTime.format("HH:mm:ss.SSS")}"`)
     console.log("Unique Player Count: " + uniquePlayerCount)
     console.log("Total Player Count: " + totalPlayerCount)
 //     console.log("Station Stats")
