@@ -28,14 +28,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       -
-        name: Install corepack
+        name: Install build dependencies
         run: |
           npm install -g corepack
           corepack enable
+          npm install -g yarn
       - 
         name: Install dependencies
         run: |
           npm install --force
+          yarn install
       - 
         name: Run build 
         run: |
